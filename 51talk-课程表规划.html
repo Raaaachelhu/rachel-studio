@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>51Talk 单词速记 · 学习规划表</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+
+:root {
+  --red: #E3120B;
+  --dark: #111;
+  --bg: #F5F1EB;
+  --paper: #FFFEFB;
+  --mid: #666;
+  --rule: #D8D2C8;
+  --formal-bg: #FEF0EE;
+  --formal-bd: #E3120B;
+  --formal-text: #A80A06;
+  --ah-bg: #FFF4E6;
+  --ah-bd: #D97706;
+  --ah-text: #92500A;
+  --aa-bg: #EBF3FB;
+  --aa-bd: #1A6FAA;
+  --aa-text: #145C8E;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Noto Serif SC',Georgia,serif;background:var(--bg);color:var(--dark);min-height:100vh;display:flex;flex-direction:column;}
+
+header{background:var(--dark);color:white;padding:0 28px;height:48px;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--red);flex-shrink:0;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;}
+.logo em{color:var(--red);font-style:normal;}
+.dev{font-size:11px;color:#888;letter-spacing:0.5px;}
+
+.app{display:flex;flex:1;overflow:hidden;height:calc(100vh - 48px);}
+
+/* LEFT */
+.left{width:270px;min-width:270px;background:var(--paper);border-right:2px solid var(--dark);display:flex;flex-direction:column;overflow-y:auto;}
+.ptitle{background:var(--dark);color:white;padding:10px 16px;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border-bottom:2px solid var(--red);}
+.fsec{padding:13px 15px;border-bottom:1px solid var(--rule);}
+.stitle{font-size:9px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--mid);margin-bottom:10px;padding-bottom:4px;border-bottom:1.5px solid var(--red);}
+.fd{margin-bottom:10px;}
+.fd:last-child{margin-bottom:0;}
+.fd label{display:block;font-size:9px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--mid);margin-bottom:4px;}
+.fd input,.fd select{width:100%;padding:6px 9px;border:1px solid var(--rule);background:white;font-family:'Noto Serif SC',serif;font-size:12px;color:var(--dark);outline:none;}
+.fd input:focus,.fd select:focus{border-color:var(--dark);box-shadow:2px 2px 0 var(--dark);}
+
+.wdg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.wb{padding:5px 0;border:1px solid var(--rule);background:white;font-size:11px;cursor:pointer;text-align:center;transition:all .15s;font-family:'Noto Serif SC',serif;color:var(--dark);}
+.wb.on{background:var(--dark);color:white;border-color:var(--dark);}
+.wb:hover:not(.on){border-color:var(--dark);}
+
+.sc{margin-top:3px;}
+.sr{display:flex;gap:4px;align-items:center;margin-bottom:5px;}
+.sr input[type=time]{flex:1;padding:5px 7px;border:1px solid var(--rule);background:white;font-size:12px;font-family:monospace;outline:none;color:var(--dark);}
+.sr input[type=time]:focus{border-color:var(--dark);}
+.si{font-size:9px;color:var(--mid);width:14px;text-align:center;flex-shrink:0;}
+.brm{width:20px;height:20px;border:1px solid var(--rule);background:white;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--mid);}
+.brm:hover{background:var(--red);color:white;border-color:var(--red);}
+.badd{width:100%;padding:5px;border:1px dashed var(--rule);background:transparent;font-size:10px;color:var(--mid);cursor:pointer;margin-top:1px;font-family:'Noto Serif SC',serif;}
+.badd:hover{border-color:var(--dark);color:var(--dark);background:#F8F5F0;}
+
+.bgen{margin:14px 15px;padding:12px;background:var(--red);color:white;border:none;font-family:'Playfair Display',serif;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:1px;text-transform:uppercase;transition:all .2s;}
+.bgen:hover{background:var(--dark);box-shadow:3px 3px 0 var(--red);}
+
+/* RIGHT */
+.right{flex:1;overflow-y:auto;overflow-x:auto;padding:20px 22px 32px;background:var(--bg);}
+
+.sh{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px;padding-bottom:10px;border-bottom:3px solid var(--dark);flex-wrap:wrap;gap:10px;}
+.st{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;}
+.sm{font-size:11px;color:var(--mid);margin-top:3px;}
+.ptag{display:inline-block;background:var(--red);color:white;font-size:10px;padding:2px 8px;margin-top:4px;font-weight:600;letter-spacing:0.5px;}
+.leg{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
+.li{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--mid);white-space:nowrap;}
+.ld{width:11px;height:11px;flex-shrink:0;}
+.note{background:#FFFEF5;border:1px dashed #E8D878;padding:7px 12px;font-size:10px;color:#8A7A00;margin-bottom:12px;font-style:italic;}
+.msep{display:flex;align-items:center;gap:10px;margin:16px 0 10px;}
+.mline{flex:1;height:2px;background:var(--dark);}
+.mtitle{font-family:'Playfair Display',serif;font-size:15px;font-weight:900;white-space:nowrap;}
+
+/* Weekly table */
+.wtbl{width:100%;border-collapse:collapse;min-width:580px;margin-bottom:14px;table-layout:fixed;}
+.wtbl td,.wtbl th{border:1px solid var(--rule);}
+
+/* Week label */
+.wlr td{background:var(--dark);color:white;padding:6px 10px;font-family:'Playfair Display',serif;font-size:12px;font-weight:700;letter-spacing:1px;}
+
+/* Date header */
+.dhr td{background:#EDEAE4;padding:5px 4px;text-align:center;vertical-align:middle;}
+.dhr td.lc{background:#E0DDD6;width:46px;min-width:46px;}
+.dn{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--dark);line-height:1;display:block;}
+.dw{font-size:9px;letter-spacing:0.5px;color:var(--mid);margin-top:2px;display:block;}
+.dhr td.tc .dn{color:var(--red);}
+.dhr td.tc{background:#FEF0EE;}
+.dhr td.pc{opacity:.4;}
+.dhr td.oc{background:#EDEBE6;}
+
+/* Band rows */
+.br td{padding:4px 5px;background:var(--paper);vertical-align:top;height:52px;}
+.br td.bl{background:#F2EFE9;text-align:center;vertical-align:middle;font-size:10px;font-weight:700;color:var(--mid);width:46px;border-right:2px solid var(--rule);}
+.br td.wkc{background:#F8F5EF;}
+.br td.pc{background:#F0EDE8;opacity:.5;}
+.br td.tc{background:#FFFAF9;}
+.br td.oc{background:#EDEBE6;}
+
+/* ★ CHIP - the event block */
+.chip{display:block;padding:3px 6px;margin-bottom:3px;font-size:10px;line-height:1.4;font-weight:600;border-radius:0;}
+.chip:last-child{margin-bottom:0;}
+.chip.formal{background:var(--formal-bg);border-left:3px solid var(--formal-bd);color:var(--formal-text);}
+.chip.ah{background:var(--ah-bg);border-left:3px solid var(--ah-bd);color:var(--ah-text);}
+.chip.aa{background:var(--aa-bg);border-left:3px solid var(--aa-bd);color:var(--aa-text);}
+.chip .ctime{display:block;font-size:9px;font-family:monospace;font-weight:400;opacity:.8;letter-spacing:0.3px;}
+.chip .cname{display:block;font-size:10px;font-weight:700;}
+.chip .cdur{display:block;font-size:9px;font-weight:400;opacity:.7;}
+.empty-cell{color:#CCC;font-size:10px;padding:2px 4px;display:block;}
+
+.empty-state{text-align:center;padding:60px 30px;color:var(--mid);}
+.empty-state .big{font-family:'Playfair Display',serif;font-size:72px;font-weight:900;color:var(--rule);line-height:1;margin-bottom:12px;}
+.empty-state p{font-size:13px;line-height:2;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">51Talk <em>单词速记</em></div>
+  <div class="dev">Developer: Rachel Hu</div>
+</header>
+
+<div class="app">
+  <div class="left">
+    <div class="ptitle">📋 规划信息录入</div>
+
+    <div class="fsec">
+      <div class="stitle">规划师信息</div>
+      <div class="fd">
+        <label>学习规划师姓名</label>
+        <input type="text" id="lpcName" placeholder="请输入您的姓名" />
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="stitle">学生信息</div>
+      <div class="fd">
+        <label>学生姓名</label>
+        <input type="text" id="stuName" placeholder="请输入学生姓名" />
+      </div>
+      <div class="fd">
+        <label>开始上课日期</label>
+        <input type="date" id="startDate" />
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="stitle" style="border-color:var(--formal-bd);">正式课（55分钟/节）</div>
+      <div class="fd">
+        <label>上课星期（点击选择）</label>
+        <div class="wdg" id="fD">
+          <button class="wb" data-d="1">一</button>
+          <button class="wb" data-d="2">二</button>
+          <button class="wb" data-d="3">三</button>
+          <button class="wb" data-d="4">四</button>
+          <button class="wb" data-d="5">五</button>
+          <button class="wb" data-d="6">六</button>
+          <button class="wb" data-d="0">日</button>
+        </div>
+      </div>
+      <div class="fd">
+        <label>上课时间</label>
+        <div class="sc" id="fS">
+          <div class="sr"><span class="si">1</span><input type="time" value="19:00" class="ft"/><button class="brm" onclick="rm(this,'fS')">×</button></div>
+        </div>
+        <button class="badd" onclick="add('fS','ft')">＋ 添加时间段</button>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="stitle" style="border-color:var(--ah-bd);">真人抗遗忘（10-15分钟/节）</div>
+      <div class="fd">
+        <label>练习星期（点击选择）</label>
+        <div class="wdg" id="ahD">
+          <button class="wb" data-d="1">一</button>
+          <button class="wb" data-d="2">二</button>
+          <button class="wb" data-d="3">三</button>
+          <button class="wb" data-d="4">四</button>
+          <button class="wb" data-d="5">五</button>
+          <button class="wb" data-d="6">六</button>
+          <button class="wb" data-d="0">日</button>
+        </div>
+      </div>
+      <div class="fd">
+        <label>练习时间</label>
+        <div class="sc" id="ahS">
+          <div class="sr"><span class="si">1</span><input type="time" value="09:00" class="aht"/><button class="brm" onclick="rm(this,'ahS')">×</button></div>
+        </div>
+        <button class="badd" onclick="add('ahS','aht')">＋ 添加时间段</button>
+      </div>
+      <div class="fd">
+        <label>每节时长</label>
+        <select id="ahDur">
+          <option value="10">10 分钟</option>
+          <option value="12">12 分钟</option>
+          <option value="15" selected>15 分钟</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="stitle" style="border-color:var(--aa-bd);">AI抗遗忘（10-15分钟/节）</div>
+      <div class="fd">
+        <label>练习星期（点击选择）</label>
+        <div class="wdg" id="aaD">
+          <button class="wb" data-d="1">一</button>
+          <button class="wb" data-d="2">二</button>
+          <button class="wb" data-d="3">三</button>
+          <button class="wb" data-d="4">四</button>
+          <button class="wb" data-d="5">五</button>
+          <button class="wb" data-d="6">六</button>
+          <button class="wb" data-d="0">日</button>
+        </div>
+      </div>
+      <div class="fd">
+        <label>练习时间</label>
+        <div class="sc" id="aaS">
+          <div class="sr"><span class="si">1</span><input type="time" value="07:30" class="aat"/><button class="brm" onclick="rm(this,'aaS')">×</button></div>
+        </div>
+        <button class="badd" onclick="add('aaS','aat')">＋ 添加时间段</button>
+      </div>
+      <div class="fd">
+        <label>每节时长</label>
+        <select id="aaDur">
+          <option value="10">10 分钟</option>
+          <option value="12">12 分钟</option>
+          <option value="15" selected>15 分钟</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="bgen" onclick="gen()">生 成 规 划 表</button>
+  </div>
+
+  <div class="right" id="right">
+    <div class="empty-state">
+      <div class="big">51</div>
+      <p>请在左侧填写课程信息<br>选择上课星期和时间<br>点击「生成规划表」即可生成学习计划</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Init: set default start date to today (Beijing time) ──
+function bjNow(){return new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Shanghai"}));}
+const bj=bjNow();
+const TODAY_Y=bj.getFullYear(), TODAY_M=bj.getMonth(), TODAY_D=bj.getDate();
+document.getElementById('startDate').value=`${TODAY_Y}-${String(TODAY_M+1).padStart(2,'0')}-${String(TODAY_D).padStart(2,'0')}`;
+
+// Weekday toggle
+document.querySelectorAll('.wb').forEach(b=>b.addEventListener('click',()=>b.classList.toggle('on')));
+
+// Add/remove time slots
+function add(cid,cls){
+  const c=document.getElementById(cid);
+  const n=c.querySelectorAll('.sr').length+1;
+  const r=document.createElement('div');r.className='sr';
+  r.innerHTML=`<span class="si">${n}</span><input type="time" value="08:00" class="${cls}"/><button class="brm" onclick="rm(this,'${cid}')">×</button>`;
+  c.appendChild(r);
+  reIdx(cid);
+}
+function rm(btn,cid){
+  const c=document.getElementById(cid);
+  if(c.querySelectorAll('.sr').length<=1)return;
+  btn.closest('.sr').remove();
+  reIdx(cid);
+}
+function reIdx(cid){
+  document.getElementById(cid).querySelectorAll('.si').forEach((e,i)=>e.textContent=i+1);
+}
+
+// Helpers
+function addMins(t,m){
+  const[h,mm]=t.split(':').map(Number),tot=h*60+mm+m;
+  return`${String(Math.floor(tot/60)).padStart(2,'0')}:${String(tot%60).padStart(2,'0')}`;
+}
+function timeBand(t){const h=+t.split(':')[0];return h<12?'m':h<18?'a':'e';}
+function getDays(id){return[...document.querySelectorAll(`#${id} .wb.on`)].map(b=>+b.dataset.d);}
+function getTimes(cid,cls){return[...document.getElementById(cid).querySelectorAll(`.${cls}`)].map(i=>i.value).filter(v=>v);}
+
+const WD=['日','一','二','三','四','五','六'];
+const MON=['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+const WN=['一','二','三','四','五','六','七','八','九','十'];
+
+function gen(){
+  const stu=document.getElementById('stuName').value.trim()||'学生';
+  const lpc=document.getElementById('lpcName').value.trim()||'—';
+  const ss=document.getElementById('startDate').value;
+  if(!ss){alert('请选择开始上课日期');return;}
+
+  const fD=getDays('fD'), fT=getTimes('fS','ft');
+  const ahD=getDays('ahD'), ahT=getTimes('ahS','aht'), ahDr=+document.getElementById('ahDur').value;
+  const aaD=getDays('aaD'), aaT=getTimes('aaS','aat'), aaDr=+document.getElementById('aaDur').value;
+
+  if(fD.length===0&&ahD.length===0&&aaD.length===0){
+    alert('请至少为一种课程类型选择上课星期！\n（点击星期按钮即可选中）');
+    return;
+  }
+
+  // Parse start date
+  const[sy,sm,sd]=ss.split('-').map(Number);
+  const sDate=new Date(sy,sm-1,sd);
+
+  // ★ KEY FIX: Show the month that contains the start date
+  // If start date is in a future month, show that month
+  // This ensures events are always visible
+  const dispY=sDate.getFullYear();
+  const dispM=sDate.getMonth();
+  const dim=new Date(dispY,dispM+1,0).getDate();
+
+  // Today string for highlighting
+  const todayStr=`${TODAY_Y}-${String(TODAY_M+1).padStart(2,'0')}-${String(TODAY_D).padStart(2,'0')}`;
+
+  // ★ Build event map for the display month
+  const ev={};
+  for(let day=1;day<=dim;day++){
+    const dt=new Date(dispY,dispM,day);
+    const dow=dt.getDay();
+    const ds=`${dispY}-${String(dispM+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    ev[ds]={m:[],a:[],e:[]};
+
+    // Skip days before course start
+    if(dt<sDate) continue;
+
+    // Add formal classes
+    if(fD.includes(dow)){
+      fT.forEach(t=>{
+        ev[ds][timeBand(t)].push({tp:'formal',t,end:addMins(t,55),lb:'正式课',dr:'55分钟'});
+      });
+    }
+    // Add human anti-forgetting
+    if(ahD.includes(dow)){
+      ahT.forEach(t=>{
+        ev[ds][timeBand(t)].push({tp:'ah',t,end:addMins(t,ahDr),lb:'真人抗遗忘',dr:`${ahDr}分钟`});
+      });
+    }
+    // Add AI anti-forgetting
+    if(aaD.includes(dow)){
+      aaT.forEach(t=>{
+        ev[ds][timeBand(t)].push({tp:'aa',t,end:addMins(t,aaDr),lb:'AI抗遗忘',dr:`${aaDr}分钟`});
+      });
+    }
+
+    // Sort each band by time
+    ['m','a','e'].forEach(b=>ev[ds][b].sort((a,x)=>a.t.localeCompare(x.t)));
+  }
+
+  // ★ Verify events exist - debug
+  let totalEvents=0;
+  Object.values(ev).forEach(d=>totalEvents+=[...d.m,...d.a,...d.e].length);
+  console.log('Total events generated:',totalEvents);
+  Object.entries(ev).forEach(([ds,d])=>{
+    const all=[...d.m,...d.a,...d.e];
+    if(all.length) console.log(ds,all.map(e=>e.lb+' '+e.t).join(', '));
+  });
+
+  // Render chip HTML
+  function chip(e){
+    return`<span class="chip ${e.tp}"><span class="ctime">${e.t} – ${e.end}</span><span class="cname">${e.lb}</span><span class="cdur">${e.dr}</span></span>`;
+  }
+
+  function cellContent(ds,b){
+    const dateObj=new Date(ds+'T00:00:00');
+    if(dateObj<sDate) return''; // past - show nothing
+    if(!ev[ds]||!ev[ds][b]||ev[ds][b].length===0){
+      return`<span class="empty-cell">—</span>`;
+    }
+    return ev[ds][b].map(e=>chip(e)).join('');
+  }
+
+  // Build weeks (Mon→Sun)
+  const w1=new Date(dispY,dispM,1);
+  const off=(w1.getDay()+6)%7; // days back to Monday
+  const wkStart=new Date(dispY,dispM,1-off);
+  const weeks=[];
+  const cur=new Date(wkStart);
+  while(true){
+    const wk=[];
+    for(let i=0;i<7;i++){const d=new Date(cur);d.setDate(cur.getDate()+i);wk.push(d);}
+    weeks.push(wk);
+    cur.setDate(cur.getDate()+7);
+    // Stop when week starts after the display month
+    if(cur.getMonth()>dispM&&cur.getFullYear()>=dispY) break;
+  }
+
+  const bands=[{k:'m',l:'上午'},{k:'a',l:'下午'},{k:'e',l:'晚上'}];
+
+  let html=`
+  <div class="sh">
+    <div>
+      <div class="st">${stu} · 单词速记课程表</div>
+      <div class="sm">${dispY}年 ${MON[dispM]} &nbsp;·&nbsp; 共${dim}天</div>
+      <div class="ptag">学习规划师：${lpc}</div>
+    </div>
+    <div class="leg">
+      <div class="li"><div class="ld" style="background:var(--formal-bg);border-left:3px solid var(--formal-bd);"></div>正式课（55分钟）</div>
+      <div class="li"><div class="ld" style="background:var(--ah-bg);border-left:3px solid var(--ah-bd);"></div>真人抗遗忘</div>
+      <div class="li"><div class="ld" style="background:var(--aa-bg);border-left:3px solid var(--aa-bd);"></div>AI抗遗忘</div>
+    </div>
+  </div>
+  <div class="note">※ 仅供参考，此表不作为排课的唯一标准，以孩子和教练约定的实际上课情况为准</div>
+  <div class="msep"><div class="mline"></div><div class="mtitle">${dispY}年${dispM+1}月</div><div class="mline"></div></div>`;
+
+  weeks.forEach((wk,wi)=>{
+    // Only render weeks that contain at least one day in display month
+    if(!wk.some(d=>d.getMonth()===dispM)) return;
+
+    html+=`<table class="wtbl"><colgroup><col style="width:46px">`;
+    for(let i=0;i<7;i++) html+=`<col>`;
+    html+=`</colgroup>`;
+
+    // Week label
+    html+=`<tr class="wlr"><td colspan="8">第${WN[wi]}周</td></tr>`;
+
+    // Date header row
+    html+=`<tr class="dhr"><td class="lc"></td>`;
+    wk.forEach(d=>{
+      const inM=d.getMonth()===dispM;
+      if(!inM){html+=`<td class="oc"></td>`;return;}
+      const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+      const isT=ds===todayStr;
+      const isPast=new Date(ds+'T00:00:00')<sDate;
+      let cls=isT?'tc':isPast?'pc':'';
+      html+=`<td class="${cls}"><span class="dn">${d.getDate()}</span><span class="dw">周${WD[d.getDay()]}</span></td>`;
+    });
+    html+=`</tr>`;
+
+    // Band rows (上午/下午/晚上)
+    bands.forEach(bn=>{
+      html+=`<tr class="br"><td class="bl">${bn.l}</td>`;
+      wk.forEach(d=>{
+        const inM=d.getMonth()===dispM;
+        if(!inM){html+=`<td class="oc"></td>`;return;}
+        const ds=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        const isT=ds===todayStr;
+        const isPast=new Date(ds+'T00:00:00')<sDate;
+        const isWknd=d.getDay()===0||d.getDay()===6;
+        let cls=isT?'tc':isPast?'pc':isWknd?'wkc':'';
+        html+=`<td class="${cls}">${cellContent(ds,bn.k)}</td>`;
+      });
+      html+=`</tr>`;
+    });
+
+    html+=`</table>`;
+  });
+
+  document.getElementById('right').innerHTML=html;
+  document.getElementById('right').scrollTop=0;
+}
+</script>
+</body>
+</html>

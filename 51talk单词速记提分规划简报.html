@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K12教育大数据检索诊断系统 | 51talk单词速记</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0A0D14; color: #E2E8F0; margin: 0; padding: 0; }
+        .font-serif-custom { font-family: 'Playfair Display', serif; }
+        .text-metallic {
+            background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            -webkit-background-clip: text; color: transparent;
+        }
+        .bg-metallic {
+            background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+            color: #0A0D14; transition: all 0.3s ease;
+        }
+        .bg-metallic:hover { box-shadow: 0 0 15px rgba(191, 149, 63, 0.5); }
+        .glass-card {
+            background: rgba(25, 30, 40, 0.7); backdrop-filter: blur(12px);
+            border: 1px solid rgba(191, 149, 63, 0.2); border-radius: 4px;
+        }
+        .editorial-report {
+            background-color: #F9F8F6; color: #111827;
+            border-top: 4px solid #B38728; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .editorial-divider { border-bottom: 1px solid #D1D5DB; margin: 1.5rem 0; }
+        .input-field {
+            background: transparent; border: none; border-bottom: 1px solid rgba(255,255,255,0.2);
+            color: #fff; padding: 6px 0; width: 100%; transition: all 0.3s; font-size: 0.875rem;
+        }
+        .input-field:focus { outline: none; border-bottom: 1px solid #BF953F; }
+        
+        /* 修复下拉框选项在部分浏览器中颜色不明显的问题 */
+        .input-field option { background-color: #1a202c; color: #fff; }
+        .input-field optgroup { background-color: #0A0D14; color: #BF953F; font-weight: bold; font-style: normal; }
+        
+        /* 经济学人风格的表格 */
+        .financial-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .financial-table th { 
+            border-bottom: 2px solid #111827; border-top: 2px solid #111827;
+            padding: 10px 4px; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #4B5563;
+        }
+        .financial-table td { border-bottom: 1px solid #E5E7EB; padding: 12px 4px; font-size: 0.875rem; }
+        .financial-table tr:last-child td { border-bottom: 2px solid #111827; font-weight: bold; }
+        
+        .typing-cursor::after { content: '▌'; animation: blink 1s step-start infinite; color: #BF953F; }
+        @keyframes blink { 50% { opacity: 0; } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start pt-8 pb-20 px-4">
+
+    <!-- Header -->
+    <header class="w-full max-w-6xl flex justify-between items-center mb-8">
+        <div class="text-2xl font-serif-custom font-bold tracking-wider text-metallic">
+            51TALK 单词速记 <span class="text-sm font-sans text-gray-400 ml-2">| 智能规划引擎</span>
+        </div>
+        <div class="text-xs text-gray-500 tracking-widest uppercase">Developer: Rachel Hu</div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <!-- 左侧：输入表单区 (4/12 宽度) -->
+        <div class="lg:col-span-4 space-y-6">
+            <div class="glass-card p-6">
+                <h2 class="font-serif-custom text-lg text-white mb-5 border-l-2 border-[#BF953F] pl-3">学生诊断参数输入</h2>
+                
+                <form id="searchForm" class="space-y-4">
+                    <!-- 基础信息 -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">学员姓名</label>
+                            <input type="text" id="studentName" class="input-field" placeholder="如：毛澄宇" value="毛澄宇">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">所在区域</label>
+                            <input type="text" id="region" class="input-field" placeholder="如：浙江" value="浙江">
+                        </div>
+                    </div>
+
+                    <!-- 学段/年级选择 (新增 12 年级覆盖) -->
+                    <div>
+                        <label class="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">当前就读年级 (1-12年级)</label>
+                        <select id="gradeLevel" class="input-field">
+                            <optgroup label="小学阶段 (Primary)">
+                                <option value="小学一年级">小学一年级 (G1)</option>
+                                <option value="小学二年级">小学二年级 (G2)</option>
+                                <option value="小学三年级">小学三年级 (G3)</option>
+                                <option value="小学四年级">小学四年级 (G4)</option>
+                                <option value="小学五年级">小学五年级 (G5)</option>
+                                <option value="小学六年级">小学六年级 (G6)</option>
+                            </optgroup>
+                            <optgroup label="初中阶段 (Middle)">
+                                <option value="初中一年级">初中一年级 (初一)</option>
+                                <option value="初中二年级" selected>初中二年级 (初二)</option>
+                                <option value="初中三年级">初中三年级 (初三)</option>
+                            </optgroup>
+                            <optgroup label="高中阶段 (High)">
+                                <option value="高中一年级">高中一年级 (高一)</option>
+                                <option value="高中二年级">高中二年级 (高二)</option>
+                                <option value="高中三年级">高中三年级 (高三)</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <!-- 分数信息 -->
+                    <div class="grid grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">当前分数</label>
+                            <input type="number" id="currentScore" class="input-field" value="90">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">目标分数</label>
+                            <input type="number" id="targetScore" class="input-field" value="115">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">卷面总分</label>
+                            <input type="number" id="totalScore" class="input-field" value="120">
+                        </div>
+                    </div>
+
+                    <!-- 词汇量评估 -->
+                    <div class="grid grid-cols-2 gap-4 bg-gray-900 bg-opacity-50 p-3 rounded">
+                        <div>
+                            <label class="block text-[10px] text-[#BF953F] uppercase tracking-wider mb-1">当前预估词汇量</label>
+                            <input type="number" id="currentVocab" class="input-field text-[#BF953F]" value="620">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-[#BF953F] uppercase tracking-wider mb-1">目标词汇要求</label>
+                            <input type="number" id="targetVocab" class="input-field text-[#BF953F]" value="2400">
+                        </div>
+                    </div>
+
+                    <!-- 考试信息 -->
+                    <div>
+                        <label class="block text-[10px] text-gray-400 uppercase tracking-wider mb-1">考试难度预估</label>
+                        <select id="difficulty" class="input-field">
+                            <option value="中等偏上">中等偏上 (含有超纲题/机考)</option>
+                            <option value="极高难度">极高难度 (重高冲刺/八校联考)</option>
+                            <option value="基础标准">基础标准 (紧贴课本大纲)</option>
+                        </select>
+                    </div>
+
+                    <button type="button" onclick="generateReport()" class="w-full bg-metallic text-black font-bold py-3 mt-4 text-sm tracking-wider flex justify-center items-center gap-2">
+                        生成智能诊断与提分规划
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 右侧：报告展示区 (8/12 宽度) -->
+        <div class="lg:col-span-8 relative">
+            
+            <!-- 加载动画 -->
+            <div id="loadingOverlay" class="hidden absolute inset-0 z-10 flex flex-col items-center justify-center bg-[#0A0D14] bg-opacity-95 backdrop-blur-md border border-gray-800 rounded">
+                <div class="w-10 h-10 border-2 border-[#BF953F] border-t-transparent rounded-full animate-spin mb-4"></div>
+                <div class="text-[#BF953F] font-serif-custom text-lg typing-cursor">正在测算提分路径及排课矩阵...</div>
+            </div>
+
+            <!-- 空状态 -->
+            <div id="emptyState" class="h-full min-h-[600px] border border-gray-800 border-dashed rounded flex flex-col items-center justify-center text-gray-600">
+                <div class="font-serif-custom text-xl">Awaiting Student Parameters</div>
+            </div>
+
+            <!-- 经济学人风格财报面板 -->
+            <div id="reportContainer" class="editorial-report p-8 hidden relative">
+                
+                <!-- 报告头部 -->
+                <div class="flex justify-between items-end border-b-2 border-black pb-3 mb-6">
+                    <div>
+                        <h1 class="font-serif-custom text-3xl font-bold text-black mb-1">LEARNING TRAJECTORY</h1>
+                        <p class="text-xs font-bold uppercase tracking-widest text-gray-500">学情诊断与排课策略简报</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-serif-custom text-sm font-bold text-[#8B0000]">CONFIDENTIAL BRIEFING</div>
+                        <div class="text-xs text-gray-500" id="currentDate"></div>
+                    </div>
+                </div>
+
+                <!-- 第一部分：学生学情基准面板 -->
+                <div class="grid grid-cols-4 gap-4 mb-6 text-sm">
+                    <div class="border-l-2 border-[#B38728] pl-3">
+                        <div class="text-[10px] uppercase text-gray-500 tracking-wider">Target Student</div>
+                        <div class="font-bold text-lg" id="resName">--</div>
+                    </div>
+                    <div class="border-l border-gray-300 pl-3">
+                        <div class="text-[10px] uppercase text-gray-500 tracking-wider">Region & Grade</div>
+                        <div class="font-bold"><span id="resRegion"></span> · <span class="text-[#8B0000]" id="resGrade"></span></div>
+                    </div>
+                    <div class="border-l border-gray-300 pl-3">
+                        <div class="text-[10px] uppercase text-gray-500 tracking-wider">Current / Target Score</div>
+                        <div class="font-bold"><span id="resCurrentScore"></span> <span class="text-gray-400 font-normal">→</span> <span id="resTargetScore"></span> <span class="text-xs text-gray-500">/ <span id="resTotalScore"></span></span></div>
+                    </div>
+                    <div class="border-l-4 border-[#8B0000] pl-3 bg-red-50 py-1">
+                        <div class="text-[10px] uppercase text-[#8B0000] font-bold tracking-wider">Vocabulary Gap</div>
+                        <div class="font-serif-custom font-bold text-2xl text-[#8B0000]" id="resGapNumber">--</div>
+                    </div>
+                </div>
+
+                <!-- 第二部分：考试考情速览 -->
+                <div class="bg-white border border-gray-200 p-4 mb-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-xs font-bold uppercase tracking-widest text-gray-500">Exam Syllabus & Assessment Structure</h3>
+                        <span class="text-xs bg-gray-200 px-2 py-1 rounded text-gray-600 font-bold" id="resDifficulty"></span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-6 text-sm">
+                        <div>
+                            <span class="font-bold">试卷结构：</span>自主命题，分为“听力部分 + 笔试部分”。<br>
+                            <span class="font-bold text-[#8B0000] mt-1 inline-block">预警提示：</span>常规背诵无法应对本地区听力机考对词汇发音的考核要求。
+                        </div>
+                        <div class="text-gray-700 text-xs leading-relaxed border-l border-gray-200 pl-4">
+                            <span class="font-bold text-gray-900">题型分布拆解：</span><br>
+                            • 听力 (约25分): 选图片 + 对话 + 短文选择 + 填空<br>
+                            • 笔试 (约95分): 单项选择 + 完形填空 + 阅读理解 + 词汇运用 + 书面表达 (80-100词)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="editorial-divider"></div>
+
+                <!-- 第三部分：核心排课表 (动态生成) -->
+                <div>
+                    <h3 class="font-serif-custom text-xl font-bold mb-1">Strategic Intervention Plan</h3>
+                    <p class="text-xs text-gray-500 mb-2">基于当前词汇绝对缺口，系统测算的阶段性提分排课矩阵如下：</p>
+                    
+                    <table class="financial-table">
+                        <thead>
+                            <tr>
+                                <th>提分阶段 (Phase)</th>
+                                <th>学习内容靶向 (Target)</th>
+                                <th>绝对缺口</th>
+                                <th>单次消化量</th>
+                                <th>核定课量</th>
+                                <th class="text-right">预计周期 (月)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="planningTableBody">
+                            <!-- JS动态注入 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 第四部分：方案匹配 -->
+                <div class="mt-8 bg-gray-900 text-white p-5 rounded-sm">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-2 h-2 bg-[#BF953F]"></span>
+                        <h4 class="font-serif-custom text-lg font-bold text-[#BF953F]">干预执行标准：1 + 6 + N 抗遗忘矩阵</h4>
+                    </div>
+                    <div class="grid grid-cols-3 gap-4 text-xs text-gray-300">
+                        <div>
+                            <strong class="text-white">1节纯正教学课 (55min)</strong><br>
+                            专注词汇突破，执行“两遍英文一遍中文、真人严格纠音”，拒绝无效耗时。
+                        </div>
+                        <div>
+                            <strong class="text-white">6遍真人高频抗遗忘</strong><br>
+                            课后配置6次(10-15min/次)真人追踪检测，打破艾宾浩斯遗忘临界点。
+                        </div>
+                        <div>
+                            <strong class="text-white">专项听口混组检测</strong><br>
+                            5词一组混排，**强制包含听力检测**，精准填补听力考试题型缺口。
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.getElementById('currentDate').innerText = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+        function generateReport() {
+            // 获取用户输入的数据
+            const name = document.getElementById('studentName').value;
+            const region = document.getElementById('region').value;
+            const gradeLevel = document.getElementById('gradeLevel').value; // 新增年级变量
+            const currentScore = document.getElementById('currentScore').value;
+            const targetScore = document.getElementById('targetScore').value;
+            const totalScore = document.getElementById('totalScore').value;
+            const currentVocab = parseInt(document.getElementById('currentVocab').value);
+            const targetVocab = parseInt(document.getElementById('targetVocab').value);
+            const difficulty = document.getElementById('difficulty').value;
+
+            // 显示Loading
+            document.getElementById('emptyState').classList.add('hidden');
+            document.getElementById('reportContainer').classList.add('hidden');
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.add('hidden');
+                
+                // 1. 注入基本信息
+                document.getElementById('resName').innerText = name;
+                document.getElementById('resRegion').innerText = region;
+                document.getElementById('resGrade').innerText = gradeLevel; // 注入年级信息
+                document.getElementById('resDifficulty').innerText = difficulty;
+                document.getElementById('resCurrentScore').innerText = currentScore;
+                document.getElementById('resTargetScore').innerText = targetScore;
+                document.getElementById('resTotalScore').innerText = totalScore;
+                
+                // 2. 算缺口
+                const gap = targetVocab - currentVocab;
+                document.getElementById('resGapNumber').innerText = gap > 0 ? gap : 0;
+
+                // 3. 动态生成排课表格 (核心算法部分：修改为单次消化 40-45 词)
+                const tbody = document.getElementById('planningTableBody');
+                tbody.innerHTML = ''; // 清空旧数据
+
+                if(gap > 0) {
+                    // 设定平均单次吸收量为 42.5
+                    let avgWordsPerClass = 42.5; 
+                    
+                    // 将缺口拆分为两个阶段：70% 核心词汇，30% 超纲冲刺词汇
+                    let phase1Gap = Math.round(gap * 0.7);
+                    let phase2Gap = gap - phase1Gap;
+
+                    // 计算课时数 (向上取整)
+                    let class1 = Math.ceil(phase1Gap / avgWordsPerClass);
+                    let class2 = Math.ceil(phase2Gap / avgWordsPerClass);
+                    
+                    // 假设一周一次正课 (1个月=4次课)
+                    let month1 = (class1 / 4).toFixed(1);
+                    let month2 = (class2 / 4).toFixed(1);
+
+                    const rows = `
+                        <tr>
+                            <td class="font-bold text-gray-900">第一阶段</td>
+                            <td>必考核心词标重塑</td>
+                            <td class="text-[#8B0000] font-bold">${phase1Gap}</td>
+                            <td>40-45 词/次</td>
+                            <td class="font-bold">${class1} 节</td>
+                            <td class="text-right">${month1} 个月</td>
+                        </tr>
+                        <tr>
+                            <td class="font-bold text-gray-900">第二阶段</td>
+                            <td>高频超纲词汇冲刺</td>
+                            <td class="text-[#8B0000] font-bold">${phase2Gap}</td>
+                            <td>40-45 词/次</td>
+                            <td class="font-bold">${class2} 节</td>
+                            <td class="text-right">${month2} 个月</td>
+                        </tr>
+                        <tr class="bg-gray-50">
+                            <td>TOTAL</td>
+                            <td>总计提分工程方案</td>
+                            <td class="text-[#8B0000] font-bold">${gap}</td>
+                            <td>-</td>
+                            <td class="font-bold text-lg">${class1 + class2} 节</td>
+                            <td class="text-right font-bold">${(parseFloat(month1) + parseFloat(month2)).toFixed(1)} 个月</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML = rows;
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="6" class="text-center text-gray-500 py-4">当前词汇量已达标，建议转向其他学科或口语专项训练。</td></tr>`;
+                }
+
+                // 显示报告
+                document.getElementById('reportContainer').classList.remove('hidden');
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

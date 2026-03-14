@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>51Talk 单词速记 · 学习规划系统</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Oswald:wght@400;600;700&display=swap');
+
+  :root {
+    /* Economist colour palette */
+    --red: #E3120B;
+    --red-dark: #B50000;
+    --red-light: #FF3B30;
+    --gold: #D4A017;
+    --gold-light: #E8C547;
+    --navy: #F2EFE9;          /* Economist off-white/cream page background */
+    --navy-mid: #FFFFFF;      /* pure white for cards */
+    --navy-light: #EAE6DF;    /* slightly warmer card bg */
+    --sky: #006BA6;           /* Economist deep blue for accents */
+    --white: #1A1A1A;         /* dark text on light bg */
+    --gray-100: #F7F5F0;
+    --gray-300: #555555;
+    --gray-500: #888888;
+    --text: #1A1A1A;
+    --accent-green: #007A6E;  /* muted teal accent */
+    /* extra economist tones */
+    --econ-red: #E3120B;
+    --econ-blue: #006BA6;
+    --econ-cream: #F2EFE9;
+    --econ-rule: #CCCCCC;
+    --econ-dark: #1A1A1A;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Noto Sans SC', sans-serif;
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: #E3120B;
+    padding: 0 40px;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    position: relative;
+    overflow: hidden;
+    border-bottom: 4px solid #9B0000;
+  }
+  .logo { display: flex; align-items: center; gap: 16px; z-index: 1; padding: 18px 0; }
+  .logo-badge {
+    background: white; color: #E3120B;
+    font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700;
+    padding: 5px 13px; border-radius: 3px; letter-spacing: 1px;
+  }
+  .logo-text { font-size: 17px; font-weight: 700; letter-spacing: 0.3px; color: #fff; }
+  .logo-sub { font-size: 11px; opacity: 0.75; font-weight: 300; letter-spacing: 2px; color: #fff; }
+  .header-right {
+    font-size: 12px; text-align: right; z-index: 1;
+    display: flex; flex-direction: column; justify-content: center; gap: 4px;
+    padding: 14px 0; color: rgba(255,255,255,0.9);
+  }
+  .header-developer {
+    font-size: 11px; color: rgba(255,255,255,0.6);
+    letter-spacing: 0.5px; font-style: italic;
+  }
+
+  /* ===== TABS ===== */
+  .tab-bar {
+    background: #fff;
+    border-bottom: 2px solid var(--econ-rule);
+    display: flex;
+    gap: 0;
+    padding: 0 40px;
+  }
+  .tab-btn {
+    padding: 14px 26px;
+    background: none;
+    border: none;
+    color: #555;
+    font-family: 'Noto Sans SC', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .tab-btn:hover { color: #E3120B; }
+  .tab-btn.active { color: #E3120B; border-bottom-color: #E3120B; font-weight: 700; }
+
+  /* ===== MAIN LAYOUT ===== */
+  .container { max-width: 1300px; margin: 0 auto; padding: 40px 24px; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .page-title { text-align: center; margin-bottom: 40px; }
+  .page-title h1 {
+    font-family: 'Noto Serif SC', serif; font-size: 30px; font-weight: 900;
+    color: #E3120B;
+    margin-bottom: 8px;
+  }
+  .page-title p { color: #666; font-size: 13px; letter-spacing: 1.5px; }
+
+  /* ===== FORM CARD ===== */
+  .form-card {
+    background: #fff;
+    border: 1px solid var(--econ-rule);
+    border-radius: 4px; padding: 36px; margin-bottom: 32px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+    position: relative; overflow: hidden;
+  }
+  .form-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+    background: #E3120B;
+  }
+  .form-title {
+    font-family: 'Noto Serif SC', serif; font-size: 17px; font-weight: 700;
+    color: #1A1A1A; margin-bottom: 28px; display: flex; align-items: center; gap: 10px;
+    border-bottom: 1px solid #e0e0e0; padding-bottom: 12px;
+  }
+  .form-title::before { content: '✦'; color: #E3120B; }
+
+  .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 28px; }
+  @media (max-width: 900px) { .form-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px) { .form-grid { grid-template-columns: 1fr; } }
+
+  .form-group label {
+    display: block; font-size: 11px; font-weight: 700; color: #555;
+    letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase;
+  }
+  .form-group input, .form-group select {
+    width: 100%; background: #fafafa;
+    border: 1px solid #ccc; border-radius: 3px;
+    color: #1A1A1A; font-size: 14px; font-family: 'Noto Sans SC', sans-serif;
+    padding: 10px 14px; outline: none; transition: all 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus {
+    border-color: #E3120B; background: #fff;
+    box-shadow: 0 0 0 2px rgba(227,18,11,0.1);
+  }
+  .form-group select option { background: #fff; color: #1A1A1A; }
+  .form-group input::placeholder { color: #aaa; }
+
+  .fail-types { grid-column: 1 / -1; }
+  .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+  .checkbox-item {
+    display: flex; align-items: center; gap: 6px;
+    background: #f5f5f5; border: 1px solid #ddd;
+    border-radius: 3px; padding: 6px 14px; cursor: pointer; transition: all 0.2s;
+    font-size: 13px; user-select: none; color: #444;
+  }
+  .checkbox-item:hover { border-color: #E3120B; background: #fff5f5; color: #E3120B; }
+  .checkbox-item.checked { background: #fff0f0; border-color: #E3120B; color: #E3120B; font-weight: 600; }
+  .checkbox-item input { display: none; }
+
+  .generate-btn {
+    display: block; width: 100%; padding: 15px;
+    background: #E3120B;
+    border: none; border-radius: 3px; color: white;
+    font-size: 17px; font-family: 'Noto Serif SC', serif; font-weight: 700;
+    letter-spacing: 2px; cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(227,18,11,0.25);
+  }
+  .generate-btn:hover { background: #b50000; box-shadow: 0 4px 16px rgba(227,18,11,0.35); transform: translateY(-1px); }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ===== LOADING ===== */
+  .loading { display: none; text-align: center; padding: 60px 20px; }
+  .loading.active { display: block; }
+  .loading-spinner {
+    width: 50px; height: 50px;
+    border: 3px solid #e0e0e0; border-top-color: #E3120B;
+    border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: #555; font-size: 15px; animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+
+  /* ===== REPORT ===== */
+  #report { display: none; }
+  #report.show { display: block; }
+
+  .report-header {
+    background: #fff; border: 1px solid #ddd; border-left: 5px solid #E3120B;
+    border-radius: 3px; padding: 32px 40px; margin-bottom: 22px;
+    position: relative; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  .report-header::after {
+    content: '51Talk'; position: absolute; right: 30px; top: 50%; transform: translateY(-50%);
+    font-family: 'Oswald', sans-serif; font-size: 80px; font-weight: 700;
+    color: rgba(0,0,0,0.04); pointer-events: none;
+  }
+  .report-badge {
+    display: inline-block; background: #E3120B;
+    color: white; font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    padding: 3px 10px; border-radius: 2px; margin-bottom: 14px;
+  }
+  .report-student-name {
+    font-family: 'Noto Serif SC', serif; font-size: 34px; font-weight: 900;
+    color: #1A1A1A; margin-bottom: 4px;
+  }
+  .report-subtitle { font-size: 13px; color: #777; letter-spacing: 0.5px; margin-bottom: 20px; }
+  .report-meta { display: flex; gap: 28px; flex-wrap: wrap; }
+  .meta-item { display: flex; flex-direction: column; gap: 3px; }
+  .meta-label { font-size: 10px; color: #999; letter-spacing: 1px; text-transform: uppercase; }
+  .meta-value { font-size: 14px; font-weight: 700; color: #1A1A1A; }
+  .meta-value.highlight { color: #9A7000; }
+  .meta-value.danger { color: #E3120B; }
+  .meta-value.success { color: #007A6E; }
+
+  .score-visual {
+    display: flex; align-items: center; gap: 24px; margin-top: 18px;
+    padding-top: 18px; border-top: 1px solid #e8e8e8;
+  }
+  .score-circle { position: relative; width: 90px; height: 90px; }
+  .score-circle svg { transform: rotate(-90deg); }
+  .score-circle .score-text {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;
+  }
+  .score-num { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; color: #1A1A1A; display: block; line-height: 1; }
+  .score-den { font-size: 10px; color: #999; }
+  .score-info { flex: 1; }
+  .score-label { font-size: 12px; color: #777; margin-bottom: 4px; }
+  .gap-display { font-family: 'Oswald', sans-serif; font-size: 28px; font-weight: 700; color: #E3120B; }
+  .gap-label { font-size: 11px; color: #999; margin-top: 2px; }
+
+  .sections-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+  @media (max-width: 800px) { .sections-grid { grid-template-columns: 1fr; } }
+  .sections-full { margin-bottom: 18px; }
+
+  .section-card {
+    background: #fff; border: 1px solid #e0e0e0;
+    border-radius: 3px; overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .section-card:hover { transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.1); }
+  .section-header { padding: 14px 20px; display: flex; align-items: center; gap: 10px; }
+  .section-icon { width: 34px; height: 34px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .section-title { font-family: 'Noto Serif SC', serif; font-size: 14px; font-weight: 700; flex: 1; }
+  .section-num { font-family: 'Oswald', sans-serif; font-size: 10px; font-weight: 600; opacity: 0.35; letter-spacing: 1px; color: #333; }
+  .section-body { padding: 0 20px 20px; }
+
+  .theme-red .section-header { background: #fff5f5; border-bottom: 2px solid #E3120B; }
+  .theme-red .section-icon { background: #fde8e8; }
+  .theme-red .section-title { color: #B50000; }
+  .theme-gold .section-header { background: #fffbf0; border-bottom: 2px solid #D4A017; }
+  .theme-gold .section-icon { background: #fef5d4; }
+  .theme-gold .section-title { color: #9A7000; }
+  .theme-sky .section-header { background: #f0f6fc; border-bottom: 2px solid #006BA6; }
+  .theme-sky .section-icon { background: #dceef9; }
+  .theme-sky .section-title { color: #006BA6; }
+  .theme-green .section-header { background: #f0faf8; border-bottom: 2px solid #007A6E; }
+  .theme-green .section-icon { background: #d4f0ec; }
+  .theme-green .section-title { color: #007A6E; }
+  .theme-purple .section-header { background: #f7f3fc; border-bottom: 2px solid #6B48B0; }
+  .theme-purple .section-icon { background: #e8dff7; }
+  .theme-purple .section-title { color: #6B48B0; }
+  .theme-orange .section-header { background: #fff7f0; border-bottom: 2px solid #C85A00; }
+  .theme-orange .section-icon { background: #fde8d4; }
+  .theme-orange .section-title { color: #C85A00; }
+
+  .info-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px;
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-row .key { color: #666; }
+  .info-row .val { font-weight: 700; color: #1A1A1A; text-align: right; max-width: 60%; }
+  .info-row .val.red { color: #E3120B; }
+  .info-row .val.gold { color: #9A7000; }
+  .info-row .val.green { color: #007A6E; }
+  .info-row .val.sky { color: #006BA6; }
+
+  .bar-item { margin: 10px 0; }
+  .bar-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; color: #666; }
+  .bar-label span:last-child { font-weight: 700; color: #1A1A1A; }
+  .bar-track { height: 7px; background: #f0f0f0; border-radius: 2px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 2px; transition: width 1s cubic-bezier(0.4,0,0.2,1); }
+
+  .tag-list { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
+  .tag { font-size: 11px; padding: 3px 10px; border-radius: 2px; font-weight: 600; }
+  .tag-red { background: #fde8e8; color: #B50000; border: 1px solid #f5c0c0; }
+  .tag-gold { background: #fef5d4; color: #9A7000; border: 1px solid #f0d870; }
+  .tag-sky { background: #dceef9; color: #006BA6; border: 1px solid #a8d4ef; }
+  .tag-green { background: #d4f0ec; color: #007A6E; border: 1px solid #8fd8d0; }
+  .tag-gray { background: #f5f5f5; color: #555; border: 1px solid #ddd; }
+
+  .highlight-box {
+    background: #fff8f0; border: 1px solid #f0d4b0; border-left: 3px solid #D4A017;
+    border-radius: 2px; padding: 13px 15px; margin: 12px 0; font-size: 13px; line-height: 1.7; color: #333;
+  }
+  .highlight-box strong { color: #9A7000; }
+
+  .exam-item { background: #fafafa; border: 1px solid #eee; border-radius: 3px; padding: 12px 14px; margin: 8px 0; }
+  .exam-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+  .exam-name { font-size: 13px; font-weight: 700; color: #1A1A1A; }
+  .exam-date { font-size: 11px; color: #999; }
+  .exam-difficulty { display: flex; gap: 3px; margin-top: 4px; }
+  .diff-dot { width: 8px; height: 8px; border-radius: 50%; background: #e0e0e0; }
+  .diff-dot.fill { background: #E3120B; }
+  .exam-desc { font-size: 11px; color: #666; margin-top: 5px; line-height: 1.5; }
+
+  .word-example {
+    background: #fafafa; border-left: 3px solid #E3120B;
+    padding: 10px 14px; margin: 8px 0;
+  }
+  .word-en { font-family: 'Oswald', sans-serif; font-size: 16px; font-weight: 600; color: #E3120B; }
+  .word-zh { font-size: 12px; color: #555; margin-top: 2px; }
+  .word-context { font-size: 11px; color: #999; margin-top: 4px; font-style: italic; }
+  .word-impact { display: inline-block; background: #fde8e8; color: #B50000; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 2px; margin-top: 5px; }
+
+  .vocab-pyramid { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; }
+  .pyramid-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+  .pyramid-bar {
+    height: 24px; border-radius: 2px; display: flex; align-items: center;
+    justify-content: flex-end; padding-right: 8px; font-size: 11px; font-weight: 700;
+    color: #fff; transition: width 1s ease; min-width: 40px;
+  }
+  .pyramid-label { color: #666; white-space: nowrap; min-width: 70px; }
+
+  .insight-box {
+    background: #fff; border: 1px solid #ddd; border-top: 4px solid #E3120B;
+    border-radius: 3px; padding: 24px; margin: 20px 0; text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .insight-box .icon { font-size: 30px; margin-bottom: 10px; }
+  .insight-box h3 { font-family: 'Noto Serif SC', serif; font-size: 19px; font-weight: 900; color: #1A1A1A; margin-bottom: 8px; }
+  .insight-box p { font-size: 13px; color: #555; line-height: 1.8; max-width: 700px; margin: 0 auto; }
+
+  .advice-card {
+    background: #fff; border: 1px solid #ddd; border-left: 5px solid #007A6E;
+    border-radius: 3px; padding: 28px; margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .advice-title {
+    font-family: 'Noto Serif SC', serif; font-size: 20px; font-weight: 900;
+    color: #007A6E; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+  }
+  .advice-list { list-style: none; }
+  .advice-list li {
+    padding: 12px 0; border-bottom: 1px solid #f0f0f0;
+    font-size: 14px; line-height: 1.8; color: #333; display: flex; gap: 12px;
+  }
+  .advice-list li:last-child { border-bottom: none; }
+  .advice-num {
+    background: #007A6E; color: white; width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 900; flex-shrink: 0; margin-top: 2px;
+  }
+  .advice-text strong { color: #9A7000; }
+
+  .action-bar { display: flex; gap: 12px; margin-top: 24px; justify-content: center; }
+  .btn-secondary {
+    padding: 11px 26px; background: #fff; border: 1px solid #ccc; border-radius: 3px;
+    color: #444; font-size: 13px; font-family: 'Noto Sans SC', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-secondary:hover { background: #f5f5f5; border-color: #999; }
+  .btn-primary {
+    padding: 11px 26px; background: #007A6E; border: none; border-radius: 3px; color: white;
+    font-size: 13px; font-family: 'Noto Sans SC', sans-serif; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .btn-primary:hover { background: #005a52; transform: translateY(-1px); box-shadow: 0 3px 12px rgba(0,122,110,0.3); }
+
+  /* ===== VOCAB LIBRARY TAB ===== */
+  .vocab-filter-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; align-items: center; }
+  .filter-group { display: flex; align-items: center; gap: 8px; }
+  .filter-group label { font-size: 12px; color: #555; font-weight: 700; letter-spacing: 1px; white-space: nowrap; }
+  .filter-group select {
+    background: #fff; border: 1px solid #ccc; border-radius: 3px; color: #1A1A1A;
+    font-size: 13px; font-family: 'Noto Sans SC', sans-serif; padding: 8px 12px;
+    outline: none; transition: all 0.2s; cursor: pointer;
+  }
+  .filter-group select:focus { border-color: #E3120B; box-shadow: 0 0 0 2px rgba(227,18,11,0.1); }
+  .filter-group select option { background: #fff; }
+
+  .search-bar {
+    flex: 1; min-width: 200px; background: #fff; border: 1px solid #ccc; border-radius: 3px;
+    color: #1A1A1A; font-size: 13px; font-family: 'Noto Sans SC', sans-serif;
+    padding: 8px 14px; outline: none; transition: all 0.2s;
+  }
+  .search-bar:focus { border-color: #E3120B; box-shadow: 0 0 0 2px rgba(227,18,11,0.1); }
+  .search-bar::placeholder { color: #aaa; }
+
+  /* Vocab table */
+  .vocab-table-wrap {
+    background: #fff; border: 1px solid #ddd;
+    border-radius: 3px; overflow: hidden; margin-bottom: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .vocab-table-header {
+    background: #f7f5f0; padding: 16px 22px; border-bottom: 2px solid #E3120B;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .vocab-table-title { font-family: 'Noto Serif SC', serif; font-size: 16px; font-weight: 700; color: #1A1A1A; }
+  .vocab-count { font-family: 'Oswald', sans-serif; font-size: 13px; color: #777; }
+
+  table.vtable { width: 100%; border-collapse: collapse; }
+  table.vtable thead tr { background: #f7f5f0; }
+  table.vtable th {
+    padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 700;
+    color: #777; letter-spacing: 1px; text-transform: uppercase;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  table.vtable td {
+    padding: 11px 16px; font-size: 13px; border-bottom: 1px solid #f0f0f0;
+    vertical-align: middle; color: #1A1A1A;
+  }
+  table.vtable tr:last-child td { border-bottom: none; }
+  table.vtable tbody tr:hover { background: #fafafa; }
+  .vtable-level { font-size: 11px; padding: 3px 9px; border-radius: 2px; font-weight: 700; white-space: nowrap; display: inline-block; }
+  .vtable-level.primary { background: #d4f0ec; color: #007A6E; border: 1px solid #8fd8d0; }
+  .vtable-level.middle { background: #dceef9; color: #006BA6; border: 1px solid #a8d4ef; }
+  .vtable-level.high { background: #fef5d4; color: #9A7000; border: 1px solid #f0d870; }
+  .vtable-words { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; color: #1A1A1A; }
+  .vtable-words.high-count { color: #9A7000; }
+  .vtable-words.mid-count { color: #006BA6; }
+  .vtable-words.low-count { color: #999; }
+  .vtable-edition { color: #666; font-size: 12px; }
+  .vtable-name { color: #1A1A1A; font-weight: 500; }
+  .vtable-note { color: #999; font-size: 11px; line-height: 1.5; }
+
+  .stats-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px;
+  }
+  .stat-card {
+    background: #fff; border: 1px solid #ddd; border-top: 3px solid #E3120B;
+    border-radius: 3px; padding: 20px; text-align: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .stat-num { font-family: 'Oswald', sans-serif; font-size: 36px; font-weight: 700; color: #E3120B; line-height: 1; }
+  .stat-label { font-size: 12px; color: #777; margin-top: 6px; }
+
+  .no-results { text-align: center; padding: 60px 20px; color: #999; font-size: 14px; }
+  .no-results .icon { font-size: 40px; margin-bottom: 12px; }
+
+  /* Pagination */
+  .pagination { display: flex; justify-content: center; gap: 8px; padding: 20px; }
+  .page-num {
+    width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+    background: #fff; border: 1px solid #ddd; border-radius: 3px;
+    color: #555; font-size: 13px; cursor: pointer; transition: all 0.2s;
+  }
+  .page-num:hover { background: #fff5f5; border-color: #E3120B; color: #E3120B; }
+  .page-num.active { background: #E3120B; border-color: #E3120B; color: #fff; font-weight: 700; }
+
+  @media print {
+    body { background: white; color: black; }
+    .form-card, .action-bar, .header, .tab-bar { display: none !important; }
+    .section-card, .report-header, .advice-card {
+      background: white !important; border: 1px solid #ddd !important; color: black !important; break-inside: avoid;
+    }
+  }
+
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  .section-card, .report-header, .advice-card, .insight-box { animation: fadeInUp 0.5s ease both; }
+  .section-card:nth-child(1) { animation-delay: 0.05s; }
+  .section-card:nth-child(2) { animation-delay: 0.1s; }
+  .section-card:nth-child(3) { animation-delay: 0.15s; }
+  .section-card:nth-child(4) { animation-delay: 0.2s; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">
+    <div class="logo-badge">51Talk</div>
+    <div>
+      <div class="logo-text">单词速记 · 智能规划系统</div>
+      <div class="logo-sub">VOCABULARY ACCELERATOR · STUDY PLAN GENERATOR</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div>LPC 专属工具</div>
+    <div style="font-size:11px;opacity:0.7;margin-top:2px;" id="datetime"></div>
+    <div class="header-developer">Developer: Rachel Hu</div>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('plan')">📋 学习规划方案</button>
+  <button class="tab-btn" onclick="switchTab('vocab')">📚 同步词库查询</button>
+</div>
+
+<div class="container">
+
+  <!-- ==================== TAB 1: STUDY PLAN ==================== -->
+  <div class="tab-panel active" id="tab-plan">
+    <div class="page-title">
+      <h1>学生个性化学习规划方案生成器</h1>
+      <p>输入学生基本信息 · 自动生成专业分析报告 · 一键打印给家长</p>
+    </div>
+
+    <div class="form-card">
+      <div class="form-title">学生信息录入</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>学生姓名</label>
+          <input type="text" id="name" placeholder="请输入姓名">
+        </div>
+        <div class="form-group">
+          <label>年级</label>
+          <select id="grade">
+            <option value="">请选择年级</option>
+            <option value="小学3">小学三年级</option>
+            <option value="小学4">小学四年级</option>
+            <option value="小学5">小学五年级</option>
+            <option value="小学6">小学六年级</option>
+            <option value="初一">初一（七年级）</option>
+            <option value="初二">初二（八年级）</option>
+            <option value="初三">初三（九年级）</option>
+            <option value="高一">高一（十年级）</option>
+            <option value="高二">高二（十一年级）</option>
+            <option value="高三">高三（十二年级）</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>当前英语成绩</label>
+          <input type="number" id="score" placeholder="如：85">
+        </div>
+        <div class="form-group">
+          <label>满分分值</label>
+          <select id="fullScore">
+            <option value="100">100分</option>
+            <option value="120">120分</option>
+            <option value="150">150分</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>目标分数</label>
+          <input type="number" id="targetScore" placeholder="如：110">
+        </div>
+        <div class="form-group">
+          <label>考生地区</label>
+          <select id="region">
+            <option value="">请选择地区</option>
+            <option value="北京">北京</option><option value="上海">上海</option>
+            <option value="广东">广东</option><option value="江苏">江苏</option>
+            <option value="浙江">浙江</option><option value="山东">山东</option>
+            <option value="河南">河南</option><option value="湖北">湖北</option>
+            <option value="四川">四川</option><option value="湖南">湖南</option>
+            <option value="安徽">安徽</option><option value="河北">河北</option>
+            <option value="陕西">陕西</option><option value="福建">福建</option>
+            <option value="辽宁">辽宁</option><option value="重庆">重庆</option>
+            <option value="天津">天津</option><option value="其他">其他地区</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>教材版本</label>
+          <select id="textbook">
+            <option value="人教版">人教版（PEP）</option>
+            <option value="外研版">外研版（EEP）</option>
+            <option value="北师大版">北师大版</option>
+            <option value="沪教版">沪教版</option>
+            <option value="冀教版">冀教版</option>
+            <option value="其他">其他版本</option>
+          </select>
+        </div>
+        <div class="form-group fail-types">
+          <label>主要失分题型（可多选）</label>
+          <div class="checkbox-group" id="failTypes">
+            <div class="checkbox-item" data-val="完形填空" onclick="toggleCheck(this)">完形填空</div>
+            <div class="checkbox-item" data-val="阅读理解" onclick="toggleCheck(this)">阅读理解</div>
+            <div class="checkbox-item" data-val="词汇填空" onclick="toggleCheck(this)">词汇填空</div>
+            <div class="checkbox-item" data-val="语法填空" onclick="toggleCheck(this)">语法填空</div>
+            <div class="checkbox-item" data-val="书面表达/写作" onclick="toggleCheck(this)">书面表达/写作</div>
+            <div class="checkbox-item" data-val="翻译题" onclick="toggleCheck(this)">翻译题</div>
+            <div class="checkbox-item" data-val="听力" onclick="toggleCheck(this)">听力</div>
+            <div class="checkbox-item" data-val="单选题" onclick="toggleCheck(this)">单选题</div>
+            <div class="checkbox-item" data-val="短文改错" onclick="toggleCheck(this)">短文改错</div>
+          </div>
+        </div>
+      </div>
+      <button class="generate-btn" onclick="generatePlan()">⚡ 立即生成专属学习规划方案</button>
+    </div>
+
+    <div class="loading" id="loading">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">正在为该学生生成个性化分析报告...</div>
+    </div>
+
+    <div id="report">
+      <div id="report-content"></div>
+    </div>
+  </div>
+
+  <!-- ==================== TAB 2: VOCAB LIBRARY ==================== -->
+  <div class="tab-panel" id="tab-vocab">
+    <div class="page-title">
+      <h1>同步词库规划方案查询</h1>
+      <p>覆盖小学 · 初中 · 高中 全阶段主流教材词库 · 精准匹配学生需求</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row" id="vocab-stats"></div>
+
+    <!-- Filters -->
+    <div class="form-card" style="padding:24px 30px;margin-bottom:24px">
+      <div class="vocab-filter-bar">
+        <div class="filter-group">
+          <label>学段</label>
+          <select id="f-stage" onchange="filterVocab()">
+            <option value="">全部学段</option>
+            <option value="小学">小学</option>
+            <option value="初中">初中</option>
+            <option value="高中">高中</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>年级</label>
+          <select id="f-grade" onchange="filterVocab()">
+            <option value="">全部年级</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>版本</label>
+          <select id="f-edition" onchange="filterVocab()">
+            <option value="">全部版本</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>册别</label>
+          <select id="f-volume" onchange="filterVocab()">
+            <option value="">全部册别</option>
+            <option value="上册">上册/上</option>
+            <option value="下册">下册/下</option>
+            <option value="全册">全册/全一册</option>
+            <option value="必修">必修</option>
+            <option value="选必">选择性必修</option>
+          </select>
+        </div>
+        <input class="search-bar" type="text" id="f-search" placeholder="🔍 搜索词库名称..." oninput="filterVocab()">
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="vocab-table-wrap">
+      <div class="vocab-table-header">
+        <div class="vocab-table-title">📖 同步词库总览</div>
+        <div class="vocab-count" id="vocab-result-count">加载中...</div>
+      </div>
+      <table class="vtable">
+        <thead>
+          <tr>
+            <th style="width:60px">学段</th>
+            <th style="width:100px">版本</th>
+            <th style="width:80px">年级</th>
+            <th style="width:80px">册别</th>
+            <th>词库名称</th>
+            <th style="width:80px;text-align:right">参考词数</th>
+            <th>备注说明</th>
+          </tr>
+        </thead>
+        <tbody id="vocab-tbody"></tbody>
+      </table>
+      <div id="vocab-no-results" class="no-results" style="display:none">
+        <div class="icon">🔍</div>
+        <div>未找到匹配的词库，请尝试调整筛选条件</div>
+      </div>
+      <div class="pagination" id="vocab-pagination"></div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// ============================================================
+//  DATETIME
+// ============================================================
+function updateTime() {
+  const now = new Date();
+  document.getElementById('datetime').textContent = now.toLocaleString('zh-CN',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+updateTime(); setInterval(updateTime, 60000);
+
+// ============================================================
+//  TAB SWITCH
+// ============================================================
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&tab==='plan')||(i===1&&tab==='vocab')));
+  document.getElementById('tab-plan').classList.toggle('active', tab==='plan');
+  document.getElementById('tab-vocab').classList.toggle('active', tab==='vocab');
+  if (tab==='vocab') initVocabTab();
+}
+
+// ============================================================
+//  PLAN TAB LOGIC (original)
+// ============================================================
+function toggleCheck(el) { el.classList.toggle('checked'); }
+function getCheckedTypes() {
+  return Array.from(document.querySelectorAll('#failTypes .checkbox-item.checked')).map(el => el.dataset.val);
+}
+
+const gradeData = {
+  '小学3': { vocabRequired: 500, examPhase: '小学阶段', level: 'primary', fullVocab: 500 },
+  '小学4': { vocabRequired: 700, examPhase: '小学阶段', level: 'primary', fullVocab: 700 },
+  '小学5': { vocabRequired: 900, examPhase: '小学阶段', level: 'primary', fullVocab: 900 },
+  '小学6': { vocabRequired: 1200, examPhase: '小升初', level: 'primary', fullVocab: 1200 },
+  '初一': { vocabRequired: 1600, examPhase: '期中/期末考试', level: 'middle', fullVocab: 1600 },
+  '初二': { vocabRequired: 2100, examPhase: '中考备考期', level: 'middle', fullVocab: 2100 },
+  '初三': { vocabRequired: 2500, examPhase: '中考', level: 'middle', fullVocab: 2500 },
+  '高一': { vocabRequired: 3500, examPhase: '高中过渡期', level: 'high', fullVocab: 3500 },
+  '高二': { vocabRequired: 4500, examPhase: '联考/模考', level: 'high', fullVocab: 4500 },
+  '高三': { vocabRequired: 5500, examPhase: '高考', level: 'high', fullVocab: 5500 },
+};
+const regionCompetition = {
+  '北京': { examinees: '约8.7万', avgScore: 110, difficulty: '偏难', pressure: 92, note: '北京卷注重语篇理解与综合运用，阅读长度大，词汇难度高' },
+  '上海': { examinees: '约5.1万', avgScore: 112, difficulty: '较难', pressure: 88, note: '上海使用自主命题，词汇量要求极高，完形填空题型较难' },
+  '广东': { examinees: '约79万', avgScore: 104, difficulty: '中等偏难', pressure: 85, note: '广东省考生基数大，竞争激烈，新高考改革后词汇要求提升' },
+  '江苏': { examinees: '约36万', avgScore: 107, difficulty: '较难', pressure: 90, note: '江苏英语传统强省，生源质量高，竞争白热化' },
+  '浙江': { examinees: '约38万', avgScore: 109, difficulty: '中等', pressure: 83, note: '浙江新高考，两次机会，词汇阅读部分是关键' },
+  '山东': { examinees: '约88万', avgScore: 101, difficulty: '中等', pressure: 80, note: '山东考生基数最大之一，整体均分稳中有升' },
+  '河南': { examinees: '约136万', avgScore: 98, difficulty: '中等偏难', pressure: 95, note: '全国考生数量最多省份，竞争压力极大，考好英语是突围关键' },
+  '湖北': { examinees: '约49万', avgScore: 105, difficulty: '较难', pressure: 86, note: '湖北教育底蕴深厚，985/211录取竞争激烈' },
+  '四川': { examinees: '约71万', avgScore: 99, difficulty: '中等', pressure: 79, note: '四川考生多，但英语整体提升空间明显' },
+  '湖南': { examinees: '约69万', avgScore: 100, difficulty: '中等', pressure: 78, note: '湖南新高考，英语词汇题型多样，提分空间大' },
+  '安徽': { examinees: '约76万', avgScore: 97, difficulty: '中等', pressure: 77, note: '安徽竞争压力较大，英语是拉分关键科目' },
+  '河北': { examinees: '约82万', avgScore: 96, difficulty: '中等', pressure: 82, note: '河北新高考，词汇阅读权重加大' },
+  '陕西': { examinees: '约35万', avgScore: 98, difficulty: '中等', pressure: 75, note: '陕西考生竞争中等，英语提升空间可观' },
+  '福建': { examinees: '约22万', avgScore: 104, difficulty: '中等偏难', pressure: 80, note: '福建新高考，卷面难度适中但词汇要求高' },
+  '辽宁': { examinees: '约23万', avgScore: 102, difficulty: '中等', pressure: 76, note: '辽宁新高考，英语整体稳定' },
+  '重庆': { examinees: '约27万', avgScore: 101, difficulty: '中等', pressure: 77, note: '重庆新高考，英语词汇是突破口' },
+  '天津': { examinees: '约6.2万', avgScore: 111, difficulty: '较难', pressure: 87, note: '天津高考难度较高，词汇阅读要求严格' },
+  '其他': { examinees: '因地区而异', avgScore: 100, difficulty: '中等', pressure: 75, note: '英语词汇是各地区英语提分的核心突破口' },
+};
+const upcomingExams = {
+  '小学3': [{name:'期中考试',date:'约4月/10月',diff:2,desc:'考查小学3-4册基础词汇及句型，满分约100分'},{name:'期末考试',date:'约6月/1月',diff:3,desc:'全册词汇综合考查，含拼写、阅读短文'}],
+  '小学4': [{name:'期中考试',date:'约4月/10月',diff:2,desc:'词汇量约500词，考查句型运用能力'},{name:'期末考试',date:'约6月/1月',diff:3,desc:'全册综合测试，词汇拼写是重要考点'}],
+  '小学5': [{name:'期中/期末考试',date:'每学期',diff:3,desc:'词汇量进入700+，出现简单阅读理解'},{name:'小升初摸底测试',date:'6月前',diff:4,desc:'部分学校初升初有摸底考，考查综合能力'}],
+  '小学6': [{name:'期末考试（小学最后）',date:'6月',diff:4,desc:'全小学词汇综合考查，直接影响简历填报'},{name:'小升初入学测试',date:'6-8月',diff:5,desc:'重点中学入学考，词汇量差距在这里显现！'},{name:'初中分班考',date:'8月',diff:5,desc:'直接决定初中起点班级，影响3年发展轨迹'}],
+  '初一': [{name:'期中考试',date:'约4月/11月',diff:3,desc:'初一上下册词汇，考查词汇理解与应用'},{name:'期末考试',date:'约6月/1月',diff:4,desc:'词汇量1000+，阅读理解开始占大分'},{name:'中学分层测试',date:'全年',diff:4,desc:'部分学校定期分层，词汇薄弱的同学易下滑'}],
+  '初二': [{name:'期中/期末考试',date:'每学期',diff:4,desc:'词汇量1600+，完形填空难度升级'},{name:'初二英语学科评测',date:'11月',diff:5,desc:'全市/全区统考，结果直接影响中考备考信心'},{name:'模拟中考',date:'3-5月',diff:5,desc:'题型与中考完全一致，词汇差距在此暴露'}],
+  '初三': [{name:'中考一模',date:'3月',diff:6,desc:'中考全真模拟，词汇量直接决定阅读完形成绩'},{name:'中考二模',date:'5月',diff:7,desc:'距中考最近的预演，成绩具有高度参考价值'},{name:'中考（正考）',date:'6月',diff:8,desc:'人生第一次重大考试，词汇量是英语成败关键！'}],
+  '高一': [{name:'高中入学/分班考',date:'8-9月',diff:6,desc:'决定高中起点位置，词汇差距在高一就拉开'},{name:'期中/期末联考',date:'每学期',diff:6,desc:'全区联考，结果影响学校排名及家长信心'},{name:'高一学业水平测试',date:'12月',diff:5,desc:'部分省份强制参加，成绩计入档案'}],
+  '高二': [{name:'联考/月考',date:'全年',diff:7,desc:'高频考试，词汇量直接影响完形、阅读成绩'},{name:'高二学业水平考试',date:'6月/12月',diff:7,desc:'成绩计入高考综合评价，不可轻视'},{name:'高考模拟考',date:'3-5月',diff:7,desc:'与高考同等难度，提前暴露词汇薄弱点'}],
+  '高三': [{name:'高三一轮复习考',date:'9-11月',diff:7,desc:'系统复习阶段，词汇漏洞集中暴露'},{name:'高考一模',date:'3月',diff:8,desc:'全省/全市统测，成绩直接影响志愿填报策略'},{name:'高考二模',date:'4-5月',diff:9,desc:'最关键的模拟考，距高考仅1个月'},{name:'高考（正考）',date:'6月7-8日',diff:10,desc:'人生最重要的考试，词汇就是分数！'}],
+};
+const failTypeVocabMap = {
+  '完形填空': { vocabWeight: 85, analysis: '完形填空是词汇量考查的重灾区。每一个空都依赖语境词汇的精准识别，约85%失分来自词汇不足。' },
+  '阅读理解': { vocabWeight: 78, analysis: '阅读理解中超纲词汇出现率约15-20%，生词影响全段理解。词汇量每提升500个，阅读得分可提升8-12分。' },
+  '词汇填空': { vocabWeight: 98, analysis: '词汇填空是最直接的词汇考查题型，98%的失分直接由词汇量不足导致，背单词是唯一解法。' },
+  '语法填空': { vocabWeight: 60, analysis: '语法填空中约60%的失分源于词汇不认识，即便知道语法规则，不认识词根词缀也无法正确变形。' },
+  '书面表达/写作': { vocabWeight: 70, analysis: '写作中词汇量是拉分关键。词汇丰富的学生可以准确表达观点、用高分词替换简单词，提升2-3个档次。' },
+  '翻译题': { vocabWeight: 90, analysis: '翻译题约90%的失分与词汇相关，专业术语、固定搭配词组必须积累到位。' },
+  '听力': { vocabWeight: 65, analysis: '听力失分中65%由于不认识词汇导致无法准确捕捉信息点，加强词汇学习可显著提升听力判断力。' },
+  '单选题': { vocabWeight: 72, analysis: '单选题中词汇辨析、近义词区分、固定搭配占大部分，词汇量直接决定选项判断力。' },
+  '短文改错': { vocabWeight: 65, analysis: '短文改错中约65%的错误涉及词汇使用不当（词形错误、搭配错误），词汇积累能有效减少此类失误。' },
+};
+const highFreqWords = {
+  primary: [
+    { en: 'between', zh: '在...之间', context: '小升初真题：_____ the two schools, which is better?', impact: '小升初失分率61%' },
+    { en: 'through', zh: '穿过；通过', context: '常考句型：pass through / go through，读音易混', impact: '失分率55%' },
+    { en: 'communicate', zh: '沟通；交流', context: '写作高频词，70%学生拼写出错', impact: '写作失分率70%' },
+    { en: 'environment', zh: '环境', context: '综合题高频出现，阅读/写作均有', impact: '失分率58%' },
+  ],
+  middle: [
+    { en: 'approximately', zh: '大约；近似地', context: '阅读理解常见副词，70%学生不认识', impact: '阅读失分率72%' },
+    { en: 'significant', zh: '重要的；显著的', context: '中考真题：a ___ discovery shocked the world', impact: '完形失分率68%' },
+    { en: 'phenomenon', zh: '现象', context: '说明文阅读高频词，学生见到即懵', impact: '阅读失分率75%' },
+    { en: 'distinguish', zh: '区分；辨别', context: '完形填空干扰项设计核心词', impact: '完形失分率65%' },
+    { en: 'consequently', zh: '因此；结果', context: '阅读逻辑词，不认识导致全段误解', impact: '逻辑题失分率80%' },
+  ],
+  high: [
+    { en: 'paradigm', zh: '范式；典范', context: '新高考阅读新增词汇，80%考生不认识', impact: '阅读失分率82%' },
+    { en: 'ambiguous', zh: '模棱两可的；歧义的', context: '完形填空干扰词，理解偏差导致整题失分', impact: '完形失分率77%' },
+    { en: 'scrutinize', zh: '仔细检查；审查', context: '近年高考真题原词，超纲但高频出现', impact: '超纲失分率85%' },
+    { en: 'deteriorate', zh: '恶化；变坏', context: '完形、阅读均有，词根deter+ior+ate', impact: '完形失分率79%' },
+    { en: 'intrinsic', zh: '内在的；固有的', context: '高考议论文阅读核心词汇', impact: '阅读失分率88%' },
+  ],
+};
+function getWordLevel(grade) {
+  if (grade.includes('小学')) return 'primary';
+  if (grade.includes('初')) return 'middle';
+  return 'high';
+}
+function getVocabBreakdown(grade) {
+  const level = gradeData[grade]?.level;
+  if (level === 'primary') return [{label:'新课标核心词',pct:85,color:'#4FC3F7'},{label:'拓展词汇',pct:12,color:'#F4A623'},{label:'超纲词汇',pct:3,color:'#E8192C'}];
+  if (level === 'middle') return [{label:'中考大纲词汇',pct:65,color:'#4FC3F7'},{label:'新课标拓展词',pct:22,color:'#F4A623'},{label:'超纲高频词',pct:13,color:'#E8192C'}];
+  return [{label:'高考大纲词汇',pct:55,color:'#4FC3F7'},{label:'新课标拓展词',pct:28,color:'#F4A623'},{label:'超纲/阅读词汇',pct:17,color:'#E8192C'}];
+}
+function estimateVocab(score, fullScore, grade) {
+  const ratio = score / fullScore;
+  const gradeInfo = gradeData[grade];
+  if (!gradeInfo) return 0;
+  const baseVocab = gradeInfo.vocabRequired;
+  if (ratio >= 0.9) return Math.round(baseVocab * 0.95);
+  if (ratio >= 0.8) return Math.round(baseVocab * 0.80);
+  if (ratio >= 0.7) return Math.round(baseVocab * 0.65);
+  if (ratio >= 0.6) return Math.round(baseVocab * 0.50);
+  return Math.round(baseVocab * 0.35);
+}
+function getImprovementSpace(grade, score, fullScore, targetScore) {
+  const gap = targetScore - score;
+  const improvements = [];
+  if (grade.includes('初三') || grade.includes('高三')) {
+    improvements.push({type:'完形填空',potential:Math.round(gap*0.25),maxScore:fullScore===150?30:fullScore===120?20:15});
+    improvements.push({type:'阅读理解',potential:Math.round(gap*0.35),maxScore:fullScore===150?40:fullScore===120?30:20});
+    improvements.push({type:'词汇/语法填空',potential:Math.round(gap*0.20),maxScore:fullScore===150?15:15});
+    improvements.push({type:'书面表达',potential:Math.round(gap*0.20),maxScore:25});
+  } else {
+    improvements.push({type:'完形填空',potential:Math.round(gap*0.28),maxScore:20});
+    improvements.push({type:'阅读理解',potential:Math.round(gap*0.38),maxScore:30});
+    improvements.push({type:'词汇填空',potential:Math.round(gap*0.20),maxScore:15});
+    improvements.push({type:'写作/翻译',potential:Math.round(gap*0.14),maxScore:20});
+  }
+  return improvements;
+}
+
+function generatePlan() {
+  const name = document.getElementById('name').value.trim();
+  const grade = document.getElementById('grade').value;
+  const score = parseFloat(document.getElementById('score').value);
+  const targetScore = parseFloat(document.getElementById('targetScore').value);
+  const fullScore = parseFloat(document.getElementById('fullScore').value);
+  const region = document.getElementById('region').value;
+  const textbook = document.getElementById('textbook').value;
+  const failTypes = getCheckedTypes();
+  if (!name || !grade || isNaN(score) || isNaN(targetScore) || !region) { alert('请完整填写学生信息（姓名、年级、成绩、目标分数、地区）'); return; }
+  if (score > fullScore) { alert('当前成绩不能高于满分'); return; }
+  if (targetScore > fullScore) { alert('目标分数不能高于满分'); return; }
+  if (targetScore <= score) { alert('目标分数应高于当前成绩'); return; }
+  document.getElementById('loading').classList.add('active');
+  document.getElementById('report').classList.remove('show');
+  document.querySelector('.generate-btn').disabled = true;
+  setTimeout(() => {
+    document.getElementById('loading').classList.remove('active');
+    document.querySelector('.generate-btn').disabled = false;
+    buildReport(name, grade, score, targetScore, fullScore, region, textbook, failTypes);
+    document.getElementById('report').classList.add('show');
+    document.getElementById('report').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 2000);
+}
+
+function buildReport(name, grade, score, targetScore, fullScore, region, textbook, failTypes) {
+  const gradeInfo = gradeData[grade] || {};
+  const regionInfo = regionCompetition[region] || regionCompetition['其他'];
+  const examList = upcomingExams[grade] || [];
+  const currentVocab = estimateVocab(score, fullScore, grade);
+  const requiredVocab = gradeInfo.vocabRequired || 2500;
+  const vocabGap = Math.max(0, requiredVocab - currentVocab);
+  const scoreRatio = score / fullScore;
+  const scoreGap = targetScore - score;
+  const improvements = getImprovementSpace(grade, score, fullScore, targetScore);
+  const wordLevel = getWordLevel(grade);
+  const words = highFreqWords[wordLevel];
+  const vocabBreakdown = getVocabBreakdown(grade);
+  const scorePercent = Math.round(scoreRatio * 100);
+  const circumference = 2 * Math.PI * 40;
+  const dashOffset = circumference * (1 - scoreRatio);
+
+  // Find matching vocab libraries for this student
+  const matchingLibs = vocabDB.filter(v => {
+    const gradeMap = {'小学3':'三年级','小学4':'四年级','小学5':'五年级','小学6':'六年级','初一':'七年级','初二':'八年级','初三':'九年级','高一':'高一','高二':'高二','高三':'高三'};
+    const stageMap = {'小学3':'小学','小学4':'小学','小学5':'小学','小学6':'小学','初一':'初中','初二':'初中','初三':'初中','高一':'高中','高二':'高中','高三':'高中'};
+    return v.stage === stageMap[grade] && (v.grade.includes(gradeMap[grade]) || v.grade === gradeMap[grade]);
+  }).slice(0,6);
+
+  let html = `
+  <div class="report-header">
+    <div class="report-badge">📋 专属学习规划报告</div>
+    <div class="report-student-name">${name} 同学</div>
+    <div class="report-subtitle">${grade} · ${region} · ${textbook} · 生成时间：${new Date().toLocaleString('zh-CN')}</div>
+    <div class="report-meta">
+      <div class="meta-item"><div class="meta-label">年级</div><div class="meta-value">${grade}</div></div>
+      <div class="meta-item"><div class="meta-label">考试地区</div><div class="meta-value">${region}</div></div>
+      <div class="meta-item"><div class="meta-label">教材版本</div><div class="meta-value">${textbook}</div></div>
+      <div class="meta-item"><div class="meta-label">当前成绩</div><div class="meta-value danger">${score}分</div></div>
+      <div class="meta-item"><div class="meta-label">目标分数</div><div class="meta-value success">${targetScore}分</div></div>
+      <div class="meta-item"><div class="meta-label">满分</div><div class="meta-value">${fullScore}分</div></div>
+    </div>
+    <div class="score-visual">
+      <div class="score-circle">
+        <svg width="90" height="90" viewBox="0 0 90 90">
+          <circle cx="45" cy="45" r="40" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="6"/>
+          <circle cx="45" cy="45" r="40" fill="none" stroke="${scorePercent>=80?'#00C896':scorePercent>=60?'#F4A623':'#E8192C'}" stroke-width="6" stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}" stroke-linecap="round"/>
+        </svg>
+        <div class="score-text"><span class="score-num">${score}</span><span class="score-den">/ ${fullScore}</span></div>
+      </div>
+      <div class="score-info">
+        <div class="score-label">距离目标还差</div>
+        <div class="gap-display">+${scoreGap}分</div>
+        <div class="gap-label">通过系统词汇学习，这${scoreGap}分完全可以突破！</div>
+      </div>
+      <div class="score-info">
+        <div class="score-label">当前词汇量预估</div>
+        <div class="gap-display" style="color:#006BA6">${currentVocab.toLocaleString()}</div>
+        <div class="gap-label">年级要求：${requiredVocab.toLocaleString()}词 | 缺口：${vocabGap.toLocaleString()}词</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <div class="icon">🏆</div>
+    <h3>得单词者得天下 —— 英语成绩的核心密码</h3>
+    <p>权威研究表明：<strong style="color:#9A7000">英语总成绩的72%-85%</strong>与词汇量直接相关。${name}同学若将词汇量从当前的<strong style="color:#E3120B">${currentVocab.toLocaleString()}词</strong>提升至年级标准<strong style="color:#007A6E">${requiredVocab.toLocaleString()}词</strong>，预计英语成绩可提升 <strong style="color:#9A7000">${scoreGap}-${scoreGap+5}分</strong>。</p>
+  </div>
+
+  <div class="sections-grid">
+  <div class="section-card theme-red">
+    <div class="section-header"><div class="section-icon">🏙️</div><div class="section-title">① ${region}地区竞争压力分析</div><div class="section-num">REGION</div></div>
+    <div class="section-body">
+      <div class="info-row"><span class="key">地区参考人数（年级）</span><span class="val red">${regionInfo.examinees}人</span></div>
+      <div class="info-row"><span class="key">地区英语平均分</span><span class="val gold">${regionInfo.avgScore}分（满分${fullScore}分）</span></div>
+      <div class="info-row"><span class="key">试题难度评级</span><span class="val red">${regionInfo.difficulty}</span></div>
+      <div class="info-row"><span class="key">${name}当前成绩排名预估</span><span class="val ${scoreRatio>=0.85?'green':scoreRatio>=0.7?'gold':'red'}">${scoreRatio>=0.85?'前20%（优秀）':scoreRatio>=0.7?'前40%（中上）':scoreRatio>=0.6?'中等偏下':'后30%（需急提升）'}</span></div>
+      <div class="info-row"><span class="key">竞争压力指数</span><span class="val red">${regionInfo.pressure}/100</span></div>
+      <div class="bar-item">
+        <div class="bar-label"><span>竞争压力</span><span>${regionInfo.pressure}%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${regionInfo.pressure}%;background:linear-gradient(90deg,#B50000,#E3120B)"></div></div>
+      </div>
+      <div class="highlight-box" style="margin-top:12px"><strong>⚠️ 地区提示：</strong>${regionInfo.note}。在这样的竞争环境下，词汇量的差距会被成倍放大。</div>
+    </div>
+  </div>
+  <div class="section-card theme-sky">
+    <div class="section-header"><div class="section-icon">📚</div><div class="section-title">② ${grade}核心词汇量分析</div><div class="section-num">VOCAB</div></div>
+    <div class="section-body">
+      <div class="info-row"><span class="key">年级应达词汇量</span><span class="val sky">${requiredVocab.toLocaleString()}词</span></div>
+      <div class="info-row"><span class="key">预估现有词汇量</span><span class="val red">${currentVocab.toLocaleString()}词</span></div>
+      <div class="info-row"><span class="key">词汇缺口</span><span class="val red">${vocabGap.toLocaleString()}词</span></div>
+      <div class="info-row"><span class="key">目标词汇量（达标线）</span><span class="val green">${requiredVocab.toLocaleString()}词</span></div>
+      <div class="bar-item" style="margin-top:12px">
+        <div class="bar-label"><span>当前词汇完成度</span><span>${Math.round(currentVocab/requiredVocab*100)}%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,Math.round(currentVocab/requiredVocab*100))}%;background:linear-gradient(90deg,#E3120B,#D4A017)"></div></div>
+      </div>
+      <div style="margin-top:14px;font-size:12px;color:#888;margin-bottom:6px;font-weight:700;letter-spacing:1px">考试词汇构成分布</div>
+      ${vocabBreakdown.map(v=>`<div class="bar-item" style="margin:6px 0"><div class="bar-label"><span>${v.label}</span><span>${v.pct}%</span></div><div class="bar-track"><div class="bar-fill" style="width:${v.pct}%;background:${v.color}"></div></div></div>`).join('')}
+    </div>
+  </div>
+  </div>
+
+  <div class="sections-full">
+  <div class="section-card theme-gold">
+    <div class="section-header"><div class="section-icon">📅</div><div class="section-title">③ ${grade}即将面临的重大考试 · 倒计时预警</div><div class="section-num">EXAMS</div></div>
+    <div class="section-body" style="padding-top:12px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:10px">
+      ${examList.map(exam=>`<div class="exam-item"><div class="exam-item-header"><div class="exam-name">📌 ${exam.name}</div><div class="exam-date">🗓 ${exam.date}</div></div><div class="exam-difficulty">${Array.from({length:10},(_,i)=>`<div class="diff-dot ${i<exam.diff?'fill':''}"></div>`).join('')}<span style="font-size:11px;color:#666;margin-left:6px">难度 ${exam.diff}/10</span></div><div class="exam-desc">${exam.desc}</div></div>`).join('')}
+      </div>
+      <div class="highlight-box" style="margin-top:14px"><strong>⏰ 时间紧迫提醒：</strong>${name}同学现在开始系统提升词汇量，在下一场大考前可积累<strong>${Math.round(vocabGap*0.6).toLocaleString()}-${vocabGap.toLocaleString()}个</strong>新词汇，这将直接转化为<strong>8-15分</strong>的成绩提升！</div>
+    </div>
+  </div>
+  </div>
+
+  <div class="sections-grid">
+  <div class="section-card theme-orange">
+    <div class="section-header"><div class="section-icon">🎯</div><div class="section-title">④ 失分题型词汇重要性分析</div><div class="section-num">ANALYSIS</div></div>
+    <div class="section-body" style="padding-top:12px">
+      ${(failTypes.length>0?failTypes:['阅读理解','完形填空','词汇填空']).map(type=>{const info=failTypeVocabMap[type]||{vocabWeight:70,analysis:'该题型中词汇量至关重要。'};return`<div class="bar-item"><div class="bar-label"><span>${type}</span><span style="color:#E3120B;font-weight:700">${info.vocabWeight}%由词汇决定</span></div><div class="bar-track"><div class="bar-fill" style="width:${info.vocabWeight}%;background:linear-gradient(90deg,#B50000,#D4A017)"></div></div><div style="font-size:11px;color:#888;margin-top:4px;line-height:1.6">${info.analysis}</div></div>`}).join('<div style="margin:10px 0;border-top:1px solid rgba(255,255,255,0.05)"></div>')}
+    </div>
+  </div>
+  <div class="section-card theme-green">
+    <div class="section-header"><div class="section-icon">📈</div><div class="section-title">⑤ 提分空间预估（+${scoreGap}分路径）</div><div class="section-num">BOOST</div></div>
+    <div class="section-body" style="padding-top:12px">
+      <div class="info-row"><span class="key">当前成绩</span><span class="val red">${score}分</span></div>
+      <div class="info-row"><span class="key">目标成绩</span><span class="val green">${targetScore}分</span></div>
+      <div class="info-row"><span class="key">总提分空间</span><span class="val gold">+${scoreGap}分</span></div>
+      <div style="height:8px"></div>
+      <div style="font-size:12px;color:#888;font-weight:700;letter-spacing:1px;margin-bottom:10px">各题型提分分布</div>
+      ${improvements.map(item=>`<div class="bar-item"><div class="bar-label"><span>${item.type}</span><span style="color:#007A6E">+${item.potential}分（满分${item.maxScore}分）</span></div><div class="bar-track"><div class="bar-fill" style="width:${Math.min(100,item.potential/item.maxScore*100)}%;background:linear-gradient(90deg,#007A6E,#00c4a0)"></div></div></div>`).join('')}
+      <div class="highlight-box" style="background:#f0faf8;border-color:#8fd8d0;margin-top:14px"><strong style="color:#007A6E">✅ 核心结论：</strong>上述题型的提分几乎全部依赖词汇量提升。词汇是撬动成绩的唯一杠杆。</div>
+    </div>
+  </div>
+  </div>`;
+
+  // Matching vocab libraries section
+  if (matchingLibs.length > 0) {
+    html += `<div class="sections-full"><div class="section-card theme-sky">
+    <div class="section-header"><div class="section-icon">🗂️</div><div class="section-title">⑨ ${name}同学适用的同步词库推荐</div><div class="section-num">LIBRARY</div></div>
+    <div class="section-body" style="padding-top:12px">
+      <div style="font-size:12px;color:#888;margin-bottom:12px">以下词库与${grade}年级高度匹配，可作为51Talk课程的同步学习资料：</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px">
+      ${matchingLibs.map(lib=>{
+        const wc = parseInt(lib.words)||0;
+        const color = wc>=400?'#9A7000':wc>=200?'#006BA6':'#666';
+        return `<div style="background:#fafafa;border-radius:8px;padding:14px;border-left:3px solid #006BA6">
+          <div style="font-size:13px;font-weight:600;color:#1A1A1A;margin-bottom:6px">${lib.name}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:11px;color:#888">${lib.edition} · ${lib.grade} · ${lib.volume}</span>
+            <span style="font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:${color}">${lib.words}词</span>
+          </div>
+          ${lib.note?`<div style="font-size:11px;color:#888;margin-top:6px;line-height:1.5">${lib.note}</div>`:''}
+        </div>`;
+      }).join('')}
+      </div>
+      <div class="highlight-box" style="margin-top:14px"><strong>💡 使用建议：</strong>以上同步词库与${grade}教材完全对应。建议${name}同学优先攻克本学期的上册/下册词库，再系统强化年级累积词汇，形成完整词汇体系。</div>
+    </div>
+    </div></div>`;
+  }
+
+  html += `<div class="sections-grid">
+  <div class="section-card theme-purple">
+    <div class="section-header"><div class="section-icon">🧠</div><div class="section-title">⑦ 基于成绩的词汇量精准诊断</div><div class="section-num">DIAGNOSIS</div></div>
+    <div class="section-body">
+      <div class="highlight-box" style="background:#f7f3fc;border-color:#c4b0e8"><strong style="color:#6B48B0">📊 诊断结论：</strong>${name}同学当前英语成绩 <strong>${score}分</strong>（满分${fullScore}），对应词汇量预估为 <strong style="color:#E3120B">${currentVocab.toLocaleString()}词</strong>，仅达到${grade}应有词汇量（${requiredVocab.toLocaleString()}词）的 <strong style="color:#9A7000">${Math.round(currentVocab/requiredVocab*100)}%</strong>。</div>
+      <div class="vocab-pyramid">
+        <div class="pyramid-row"><div class="pyramid-label">满分选手</div><div class="pyramid-bar" style="width:${Math.min(180,requiredVocab/30)}px;background:linear-gradient(90deg,#00C896,#00E5B0)">${requiredVocab.toLocaleString()}词</div></div>
+        <div class="pyramid-row"><div class="pyramid-label">${name}现状</div><div class="pyramid-bar" style="width:${Math.min(180,currentVocab/30)}px;background:linear-gradient(90deg,#B50000,#E3120B)">${currentVocab.toLocaleString()}词</div></div>
+        <div class="pyramid-row"><div class="pyramid-label">最低及格</div><div class="pyramid-bar" style="width:${Math.min(180,requiredVocab*0.5/30)}px;background:linear-gradient(90deg,#607D8B,#90A4AE)">${Math.round(requiredVocab*0.5).toLocaleString()}词</div></div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="info-row"><span class="key">需补充词汇量</span><span class="val red">${vocabGap.toLocaleString()}词</span></div>
+        <div class="info-row"><span class="key">每天学习30词</span><span class="val gold">${Math.ceil(vocabGap/30)}天完成</span></div>
+        <div class="info-row"><span class="key">每天学习50词</span><span class="val green">${Math.ceil(vocabGap/50)}天完成</span></div>
+        <div class="info-row"><span class="key">51Talk速记法效率</span><span class="val sky">普通方法的3-5倍</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="section-card theme-red">
+    <div class="section-header"><div class="section-icon">📝</div><div class="section-title">⑧ ${grade}高频失分词汇举例</div><div class="section-num">EXAMPLES</div></div>
+    <div class="section-body" style="padding-top:12px">
+      <div style="font-size:12px;color:#888;margin-bottom:10px">以下为该年级真实考试中最易失分的高频词汇：</div>
+      ${words.map(w=>`<div class="word-example"><div class="word-en">${w.en}</div><div class="word-zh">${w.zh}</div><div class="word-context">"${w.context}"</div><span class="word-impact">⚡ ${w.impact}</span></div>`).join('')}
+      <div class="tag-list" style="margin-top:12px">
+        <span class="tag tag-red">考纲核心词</span><span class="tag tag-gold">超纲高频词</span>
+        <span class="tag tag-sky">阅读关键词</span><span class="tag tag-gray">完形重点词</span>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <div class="sections-full"><div class="section-card theme-gold">
+    <div class="section-header"><div class="section-icon">👑</div><div class="section-title">⑥ 为什么"得单词者得天下"——英语学习的底层逻辑</div><div class="section-num">CORE LOGIC</div></div>
+    <div class="section-body" style="padding-top:12px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px">
+        <div class="highlight-box" style="text-align:center;padding:20px"><div style="font-family:'Oswald',sans-serif;font-size:42px;font-weight:700;color:#9A7000;line-height:1">85%</div><div style="font-size:12px;color:#666;margin-top:6px">完形填空得分<br>由词汇量直接决定</div></div>
+        <div class="highlight-box" style="text-align:center;padding:20px"><div style="font-family:'Oswald',sans-serif;font-size:42px;font-weight:700;color:#006BA6;line-height:1">78%</div><div style="font-size:12px;color:#666;margin-top:6px">阅读理解失分<br>源于词汇不足</div></div>
+        <div class="highlight-box" style="text-align:center;padding:20px"><div style="font-family:'Oswald',sans-serif;font-size:42px;font-weight:700;color:#007A6E;line-height:1">+15</div><div style="font-size:12px;color:#666;margin-top:6px">词汇量提升1000词<br>平均提分15-20分</div></div>
+        <div class="highlight-box" style="text-align:center;padding:20px"><div style="font-family:'Oswald',sans-serif;font-size:42px;font-weight:700;color:#E3120B;line-height:1">72%</div><div style="font-size:12px;color:#666;margin-top:6px">英语总成绩<br>由词汇量主导</div></div>
+      </div>
+      <div class="highlight-box" style="margin-top:14px;padding:18px"><strong>🔑 核心逻辑：</strong>词汇量是英语学习的「底层代码」。对于${name}同学来说，当前最高效的提分路径就是：<strong>系统、高效、大量积累词汇</strong>。51Talk单词速记课程采用科学记忆法，帮助学生以普通方法<strong>3-5倍的速度</strong>掌握核心词汇，直接打通${grade}英语成绩的提分通道。</div>
+    </div>
+  </div></div>
+
+  <div class="advice-card">
+    <div class="advice-title">💌 给家长的建议</div>
+    <ul class="advice-list">
+      <li><div class="advice-num">1</div><div class="advice-text"><strong>正确认识${name}当前问题的根源：</strong>英语成绩${score}分（满分${fullScore}分）的背后，本质上是词汇量缺口问题。${name}现有词汇量约${currentVocab.toLocaleString()}词，与${grade}要求的${requiredVocab.toLocaleString()}词相差${vocabGap.toLocaleString()}词。这不是孩子不努力，而是学习方法和积累量不足。</div></li>
+      <li><div class="advice-num">2</div><div class="advice-text"><strong>时间窗口非常关键：</strong>${grade}是英语学习的<strong style="color:#9A7000">黄金阶段</strong>，${examList[examList.length-1]?.name||'重大考试'}即将到来。现在开始系统补充词汇，在考试前可以实现最大化的分数提升。</div></li>
+      <li><div class="advice-num">3</div><div class="advice-text"><strong>用对工具，事半功倍：</strong>51Talk单词速记课程结合<strong style="color:#006BA6">艾宾浩斯遗忘曲线</strong>、<strong style="color:#006BA6">词根词缀拆解法</strong>、<strong style="color:#006BA6">场景记忆法</strong>，让孩子在快乐中高效记住单词，记忆留存率提升至普通方法的3-5倍。</div></li>
+      <li><div class="advice-num">4</div><div class="advice-text"><strong>坚持才是最大的竞争力：</strong>在${region}的竞争环境中（平均分${regionInfo.avgScore}分），只要${name}每天坚持学习，词汇量稳步提升，就能在竞争中脱颖而出。</div></li>
+      <li><div class="advice-num">5</div><div class="advice-text"><strong>具体行动建议：</strong>建议${name}同学<strong style="color:#9A7000">每天学习30-50个新词</strong>，配合51Talk单词速记系统的智能复习计划，在<strong style="color:#9A7000">${Math.ceil(vocabGap/40)}天</strong>内补足词汇缺口。</div></li>
+      <li><div class="advice-num">6</div><div class="advice-text"><strong>预期效果承诺：</strong>根据同类学生数据，词汇量提升后，完形填空得分可提升<strong style="color:#007A6E">${Math.round(improvements[0]?.potential||5)}分</strong>，阅读理解提升<strong style="color:#007A6E">${Math.round(improvements[1]?.potential||8)}分</strong>，帮助${name}同学顺利达成<strong style="color:#9A7000">${targetScore}分</strong>的目标。</div></li>
+    </ul>
+  </div>
+  <div class="action-bar">
+    <button class="btn-secondary" onclick="window.print()">🖨️ 打印 / 保存PDF</button>
+    <button class="btn-secondary" onclick="resetForm()">↩ 重新录入</button>
+    <button class="btn-primary" onclick="window.print()">📄 生成家长报告</button>
+  </div>`;
+
+  document.getElementById('report-content').innerHTML = html;
+}
+
+function resetForm() {
+  document.getElementById('report').classList.remove('show');
+  document.getElementById('report-content').innerHTML = '';
+  document.querySelectorAll('#failTypes .checkbox-item').forEach(el => el.classList.remove('checked'));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+//  VOCAB DATABASE  (from images 1-19)
+// ============================================================
+const vocabDB = [
+  // ===== 初中同步词库 (Images 1-4) =====
+  // 北师大版
+  {stage:'初中',edition:'北师大版',grade:'七年级',volume:'上册',name:'北师大版七年级英语上册',words:271,note:''},
+  {stage:'初中',edition:'北师大版',grade:'七年级',volume:'下册',name:'【2025新】北师大版七年级英语下册',words:338,note:''},
+  {stage:'初中',edition:'北师大版',grade:'八年级',volume:'上册',name:'【2025年9月新】北师大版八年级英语上册',words:402,note:''},
+  {stage:'初中',edition:'北师大版',grade:'八年级',volume:'下册',name:'北师大版八年级英语下册',words:396,note:''},
+  {stage:'初中',edition:'北师大版',grade:'九年级',volume:'全册',name:'北师大版九年级英语全一册',words:485,note:''},
+  // 冀教版（初中）
+  {stage:'初中',edition:'冀教版',grade:'七年级',volume:'上册',name:'冀教版七年级英语上册',words:297,note:''},
+  {stage:'初中',edition:'冀教版',grade:'七年级',volume:'下册',name:'【2025新】冀教版七年级英语下册',words:274,note:''},
+  {stage:'初中',edition:'冀教版',grade:'八年级',volume:'上册',name:'【2025年9月新】冀教版八年级英语上册',words:287,note:''},
+  {stage:'初中',edition:'冀教版',grade:'八年级',volume:'下册',name:'冀教版八年级英语下册',words:346,note:''},
+  {stage:'初中',edition:'冀教版',grade:'九年级',volume:'全册',name:'冀教版九年级英语全册',words:450,note:''},
+  // 科普版（仁爱版）初中
+  {stage:'初中',edition:'科普版（仁爱版）',grade:'七年级',volume:'上册',name:'仁爱版七年级英语上册（科普版）',words:609,note:''},
+  {stage:'初中',edition:'科普版（仁爱版）',grade:'七年级',volume:'下册',name:'【2025新】仁爱版七年级英语下册（科普版）',words:423,note:''},
+  {stage:'初中',edition:'科普版（仁爱版）',grade:'八年级',volume:'上册',name:'【2025年9月新】仁爱版八年级英语上册（科普版）',words:497,note:''},
+  {stage:'初中',edition:'科普版（仁爱版）',grade:'八年级',volume:'下册',name:'仁爱版八年级英语下册（科普版）',words:423,note:''},
+  {stage:'初中',edition:'科普版（仁爱版）',grade:'九年级',volume:'上册',name:'仁爱版九年级英语上册（科普版）',words:516,note:''},
+  {stage:'初中',edition:'科普版（仁爱版）',grade:'九年级',volume:'下册',name:'仁爱版九年级英语下册（科普版）',words:295,note:''},
+  // 人教版（初中）
+  {stage:'初中',edition:'人教版',grade:'七年级',volume:'上册',name:'人教版七年级英语上册',words:295,note:''},
+  {stage:'初中',edition:'人教版',grade:'七年级',volume:'上册',name:'人教版七年级英语上册（衔接小学）',words:349,note:''},
+  {stage:'初中',edition:'人教版',grade:'七年级',volume:'下册',name:'（旧版）人教版七年级英语下册',words:489,note:'旧版'},
+  {stage:'初中',edition:'人教版',grade:'七年级',volume:'下册',name:'【2025新】人教七年级英语下册',words:436,note:''},
+  {stage:'初中',edition:'人教版',grade:'七年级',volume:'下册',name:'【2025新】人教七年级英语下册（衔接小学）',words:114,note:''},
+  {stage:'初中',edition:'人教版',grade:'八年级',volume:'上册',name:'人教版八年级英语上册',words:425,note:''},
+  {stage:'初中',edition:'人教版',grade:'八年级',volume:'上册',name:'【2025年9月新】人教版八年级英语上册',words:519,note:''},
+  {stage:'初中',edition:'人教版',grade:'八年级',volume:'上册',name:'2025年9月新】人教版八年级英语上册（衔接小学）',words:28,note:''},
+  {stage:'初中',edition:'人教版',grade:'八年级',volume:'下册',name:'人教版八年级英语下册',words:493,note:''},
+  {stage:'初中',edition:'人教版',grade:'九年级',volume:'全册',name:'人教版九年级英语全一册',words:624,note:''},
+  // 教科版（五四制）
+  {stage:'初中',edition:'教科版（五四制）',grade:'六年级',volume:'上册',name:'六年级上',words:360,note:'五四制'},
+  {stage:'初中',edition:'教科版（五四制）',grade:'六年级',volume:'下册',name:'【2025新】六年级下',words:345,note:'五四制'},
+  {stage:'初中',edition:'教科版（五四制）',grade:'七年级',volume:'上册',name:'【2025年9月新】教科版（五四制）七年级上',words:304,note:'五四制'},
+  {stage:'初中',edition:'教科版（五四制）',grade:'七年级',volume:'下册',name:'七年级下',words:216,note:'五四制'},
+  {stage:'初中',edition:'教科版（五四制）',grade:'八年级',volume:'上册',name:'八年级上',words:232,note:'五四制'},
+  {stage:'初中',edition:'教科版（五四制）',grade:'八年级',volume:'下册',name:'八年级下',words:218,note:'五四制'},
+  {stage:'初中',edition:'教科版（五四制）',grade:'九年级',volume:'上册',name:'九年级上',words:267,note:'五四制'},
+  {stage:'初中',edition:'教科版（五四制）',grade:'九年级',volume:'下册',name:'九年级下',words:200,note:'五四制'},
+  // 鲁教版（五四制）
+  {stage:'初中',edition:'鲁教版（五四制）',grade:'六年级',volume:'上册',name:'鲁教版六年级英语上册',words:282,note:'五四制'},
+  {stage:'初中',edition:'鲁教版（五四制）',grade:'六年级',volume:'下册',name:'【2025新】鲁教版六年级英语下册',words:103,note:'五四制'},
+  {stage:'初中',edition:'鲁教版（五四制）',grade:'七年级',volume:'上册',name:'【2025年9月新】鲁教版七年级英语上册',words:315,note:'五四制'},
+  {stage:'初中',edition:'鲁教版（五四制）',grade:'七年级',volume:'下册',name:'鲁教版七年级英语下册',words:339,note:'五四制'},
+  {stage:'初中',edition:'鲁教版（五四制）',grade:'八年级',volume:'上册',name:'鲁教版八年级英语上册',words:373,note:'五四制'},
+  {stage:'初中',edition:'鲁教版（五四制）',grade:'八年级',volume:'下册',name:'鲁教版八年级英语下册',words:326,note:'五四制'},
+  {stage:'初中',edition:'鲁教版（五四制）',grade:'九年级',volume:'全册',name:'鲁教版九年级英语全册',words:377,note:'五四制'},
+  // 沪教版（五四制）初中
+  {stage:'初中',edition:'沪教版（五四制）',grade:'六年级',volume:'上册',name:'六年级上',words:285,note:'五四制'},
+  {stage:'初中',edition:'沪教版（五四制）',grade:'六年级',volume:'下册',name:'【2025新】沪教（五四制）六年级下',words:271,note:'五四制'},
+  {stage:'初中',edition:'沪教版（五四制）',grade:'七年级',volume:'上册',name:'七年级上',words:260,note:'五四制'},
+  {stage:'初中',edition:'沪教版（五四制）',grade:'七年级',volume:'下册',name:'【2025新】沪教（五四制）七年级下',words:282,note:'五四制'},
+  {stage:'初中',edition:'沪教版（五四制）',grade:'八年级',volume:'上册',name:'【2025年9月新】沪教（五四制）八年级上',words:269,note:'五四制'},
+  // 教科外研社版（五四制）
+  {stage:'初中',edition:'教科外研社版（五四制）',grade:'六年级',volume:'上册',name:'六年级上',words:363,note:'五四制'},
+  {stage:'初中',edition:'教科外研社版（五四制）',grade:'六年级',volume:'下册',name:'【2025新】教科外研社版六年级下',words:345,note:'五四制'},
+  {stage:'初中',edition:'教科外研社版（五四制）',grade:'七年级',volume:'上册',name:'【2025年9月新】教科外研社版七年级上',words:374,note:'五四制'},
+  // 沪教版（初中三四制）
+  {stage:'初中',edition:'沪教版',grade:'七年级',volume:'上册',name:'沪教版七年级英语上册',words:330,note:''},
+  {stage:'初中',edition:'沪教版',grade:'七年级',volume:'下册',name:'【2025新】沪教版七年级英语下册',words:299,note:''},
+  {stage:'初中',edition:'沪教版',grade:'七年级',volume:'下册',name:'（旧版）沪教版七年级英语下册',words:227,note:'旧版'},
+  {stage:'初中',edition:'沪教版',grade:'八年级',volume:'上册',name:'【2025年新】沪教版八年级英语上册',words:229,note:''},
+  {stage:'初中',edition:'沪教版',grade:'八年级',volume:'下册',name:'【2025年新】沪教版八年级英语下册',words:254,note:''},
+  {stage:'初中',edition:'沪教版',grade:'九年级',volume:'上册',name:'沪教版九年级英语上册',words:249,note:''},
+  {stage:'初中',edition:'沪教版',grade:'九年级',volume:'下册',name:'沪教版九年级英语下册',words:188,note:''},
+  // 沪外教版
+  {stage:'初中',edition:'沪外教版',grade:'七年级',volume:'上册',name:'七年级上',words:386,note:''},
+  {stage:'初中',edition:'沪外教版',grade:'七年级',volume:'下册',name:'【2025新】七年级下',words:353,note:''},
+  {stage:'初中',edition:'沪外教版',grade:'八年级',volume:'上册',name:'【2025年9月新】沪外教版八年级上',words:521,note:''},
+  {stage:'初中',edition:'沪外教版',grade:'八年级',volume:'下册',name:'八年级下',words:318,note:''},
+  {stage:'初中',edition:'沪外教版',grade:'九年级',volume:'上册',name:'九年级上',words:281,note:''},
+  {stage:'初中',edition:'沪外教版',grade:'九年级',volume:'下册',name:'九年级下',words:266,note:''},
+  // 外研社版（初中）
+  {stage:'初中',edition:'外研社版',grade:'七年级',volume:'上册',name:'外研版七年级英语上册',words:294,note:''},
+  {stage:'初中',edition:'外研社版',grade:'七年级',volume:'下册',name:'【2025新】外研版七年级英语下册',words:378,note:''},
+  {stage:'初中',edition:'外研社版',grade:'七年级',volume:'下册',name:'（旧版）外研版七年级英语下册',words:407,note:'旧版'},
+  {stage:'初中',edition:'外研社版',grade:'八年级',volume:'上册',name:'【2025年9月新】外研版八年级英语上册',words:312,note:''},
+  {stage:'初中',edition:'外研社版',grade:'八年级',volume:'下册',name:'外研版八年级英语下册',words:260,note:''},
+  {stage:'初中',edition:'外研社版',grade:'九年级',volume:'上册',name:'外研版九年级英语上册',words:376,note:''},
+  {stage:'初中',edition:'外研社版',grade:'九年级',volume:'下册',name:'外研版九年级英语下册',words:127,note:''},
+  // 译林版（初中）
+  {stage:'初中',edition:'译林版',grade:'七年级',volume:'上册',name:'译林版七年级英语上册',words:409,note:''},
+  {stage:'初中',edition:'译林版',grade:'七年级',volume:'下册',name:'【2025新】译林版七年级英语下册',words:440,note:''},
+  {stage:'初中',edition:'译林版',grade:'八年级',volume:'上册',name:'【2025年9月新】译林版八年级英语上册',words:471,note:''},
+  {stage:'初中',edition:'译林版',grade:'八年级',volume:'下册',name:'译林版八年级英语下册',words:374,note:''},
+  {stage:'初中',edition:'译林版',grade:'九年级',volume:'上册',name:'译林版九年级英语上册',words:436,note:''},
+  {stage:'初中',edition:'译林版',grade:'九年级',volume:'下册',name:'译林版九年级英语下册',words:180,note:''},
+  // 牛津上海试用版（初中）
+  {stage:'初中',edition:'牛津上海试用版',grade:'七年级',volume:'上册',name:'牛津上海试用版七年级上',words:228,note:''},
+  {stage:'初中',edition:'牛津上海试用版',grade:'七年级',volume:'下册',name:'牛津上海试用版七年级下',words:229,note:''},
+  {stage:'初中',edition:'牛津上海试用版',grade:'八年级',volume:'上册',name:'牛津上海试用版七年级下',words:235,note:''},
+  {stage:'初中',edition:'牛津上海试用版',grade:'八年级',volume:'下册',name:'牛津上海试用版八年级下',words:240,note:''},
+  {stage:'初中',edition:'牛津上海试用版',grade:'九年级',volume:'上册',name:'牛津上海试用版九年级上',words:207,note:''},
+  {stage:'初中',edition:'牛津上海试用版',grade:'九年级',volume:'下册',name:'牛津上海试用版九年级下',words:173,note:''},
+
+  // ===== 高中同步词库 (Images 5-6) =====
+  // 人教版高中
+  {stage:'高中',edition:'人教版',grade:'高中',volume:'必修1',name:'人教版必修1',words:336,note:'覆盖北京、河北、黑龙江、安徽、福建、江西、河南等地'},
+  {stage:'高中',edition:'人教版',grade:'高中',volume:'必修2',name:'人教版必修2',words:351,note:''},
+  {stage:'高中',edition:'人教版',grade:'高中',volume:'必修3',name:'人教版必修3',words:396,note:''},
+  {stage:'高中',edition:'人教版',grade:'高中',volume:'选必1',name:'人教版选择性必修1',words:341,note:''},
+  {stage:'高中',edition:'人教版',grade:'高中',volume:'选必2',name:'人教版选择性必修2',words:345,note:''},
+  {stage:'高中',edition:'人教版',grade:'高中',volume:'选必3',name:'人教版选择性必修3',words:323,note:''},
+  {stage:'高中',edition:'人教版',grade:'高中',volume:'选必4',name:'人教版选择性必修4',words:300,note:''},
+  // 北师大版高中
+  {stage:'高中',edition:'北师大版',grade:'高中',volume:'必修1',name:'北师大版必修1',words:358,note:'北京、安徽等地在使用该教材'},
+  {stage:'高中',edition:'北师大版',grade:'高中',volume:'必修2',name:'北师大版必修2',words:305,note:''},
+  {stage:'高中',edition:'北师大版',grade:'高中',volume:'必修3',name:'北师大版必修3',words:269,note:''},
+  {stage:'高中',edition:'北师大版',grade:'高中',volume:'选必1',name:'北师大版选择性必修1',words:304,note:''},
+  {stage:'高中',edition:'北师大版',grade:'高中',volume:'选必2',name:'北师大版选择性必修2',words:343,note:''},
+  {stage:'高中',edition:'北师大版',grade:'高中',volume:'选必3',name:'北师大版选择性必修3',words:305,note:''},
+  {stage:'高中',edition:'北师大版',grade:'高中',volume:'选必4',name:'北师大版选择性必修4',words:236,note:''},
+  // 外研社版高中
+  {stage:'高中',edition:'外研社版',grade:'高中',volume:'必修1',name:'外研社版必修1',words:406,note:''},
+  {stage:'高中',edition:'外研社版',grade:'高中',volume:'必修2',name:'外研社版必修2',words:362,note:''},
+  {stage:'高中',edition:'外研社版',grade:'高中',volume:'必修3',name:'外研社版必修3',words:283,note:''},
+  {stage:'高中',edition:'外研社版',grade:'高中',volume:'选必1',name:'外研社版选择性必修1',words:260,note:''},
+  {stage:'高中',edition:'外研社版',grade:'高中',volume:'选必2',name:'外研社版选择性必修2',words:345,note:''},
+  {stage:'高中',edition:'外研社版',grade:'高中',volume:'选必3',name:'外研社版选择性必修3',words:360,note:''},
+  {stage:'高中',edition:'外研社版',grade:'高中',volume:'选必4',name:'外研社版选择性必修4',words:229,note:''},
+  // 译林版高中
+  {stage:'高中',edition:'译林版',grade:'高中',volume:'必修1',name:'译林版必修1',words:276,note:'江苏、湖南等地在使用该教材'},
+  {stage:'高中',edition:'译林版',grade:'高中',volume:'必修2',name:'译林版必修2',words:295,note:''},
+  {stage:'高中',edition:'译林版',grade:'高中',volume:'必修3',name:'译林版必修3',words:295,note:''},
+  {stage:'高中',edition:'译林版',grade:'高中',volume:'选必1',name:'译林版选择性必修1',words:320,note:''},
+  {stage:'高中',edition:'译林版',grade:'高中',volume:'选必2',name:'译林版选择性必修2',words:341,note:''},
+  {stage:'高中',edition:'译林版',grade:'高中',volume:'选必3',name:'译林版选择性必修3',words:293,note:''},
+  {stage:'高中',edition:'译林版',grade:'高中',volume:'选必4',name:'译林版选择性必修4',words:294,note:''},
+  // 冀教版高中
+  {stage:'高中',edition:'冀教版',grade:'高中',volume:'必修1',name:'冀教版必修1',words:311,note:''},
+  {stage:'高中',edition:'冀教版',grade:'高中',volume:'必修2',name:'冀教版必修2',words:255,note:''},
+  {stage:'高中',edition:'冀教版',grade:'高中',volume:'必修3',name:'冀教版必修3',words:197,note:''},
+  {stage:'高中',edition:'冀教版',grade:'高中',volume:'选必1',name:'冀教版选择性必修1',words:342,note:''},
+  {stage:'高中',edition:'冀教版',grade:'高中',volume:'选必2',name:'冀教版选择性必修2',words:354,note:''},
+  {stage:'高中',edition:'冀教版',grade:'高中',volume:'选必3',name:'冀教版选择性必修3',words:383,note:''},
+  {stage:'高中',edition:'冀教版',grade:'高中',volume:'选必4',name:'冀教版选择性必修4',words:298,note:''},
+  // 重庆大学版高中
+  {stage:'高中',edition:'重庆大学版',grade:'高中',volume:'必修1',name:'重庆大学版必修1',words:702,note:''},
+  {stage:'高中',edition:'重庆大学版',grade:'高中',volume:'必修2',name:'重庆大学版必修2',words:715,note:''},
+  {stage:'高中',edition:'重庆大学版',grade:'高中',volume:'必修3',name:'重庆大学版必修3',words:615,note:''},
+  {stage:'高中',edition:'重庆大学版',grade:'高中',volume:'选必1',name:'重庆大学版选择性必修1',words:665,note:''},
+  {stage:'高中',edition:'重庆大学版',grade:'高中',volume:'选必2',name:'重庆大学版选择性必修2',words:576,note:''},
+  {stage:'高中',edition:'重庆大学版',grade:'高中',volume:'选必3',name:'重庆大学版选择性必修3',words:652,note:''},
+  {stage:'高中',edition:'重庆大学版',grade:'高中',volume:'选必4',name:'重庆大学版选择性必修4',words:521,note:''},
+  // 沪教版高中
+  {stage:'高中',edition:'沪教版',grade:'高中',volume:'必修1',name:'沪教版必修1',words:242,note:''},
+  {stage:'高中',edition:'沪教版',grade:'高中',volume:'必修2',name:'沪教版必修2',words:217,note:''},
+  {stage:'高中',edition:'沪教版',grade:'高中',volume:'必修3',name:'沪教版必修3',words:228,note:''},
+  {stage:'高中',edition:'沪教版',grade:'高中',volume:'选必1',name:'沪教版选择性必修1',words:256,note:''},
+  {stage:'高中',edition:'沪教版',grade:'高中',volume:'选必2',name:'沪教版选择性必修2',words:263,note:''},
+  {stage:'高中',edition:'沪教版',grade:'高中',volume:'选必3',name:'沪教版选择性必修3',words:263,note:''},
+  {stage:'高中',edition:'沪教版',grade:'高中',volume:'选必4',name:'沪教版选择性必修4',words:231,note:''},
+  // 沪外教版高中
+  {stage:'高中',edition:'沪外教版',grade:'高中',volume:'必修1',name:'沪外教版必修1',words:281,note:''},
+  {stage:'高中',edition:'沪外教版',grade:'高中',volume:'必修2',name:'沪外教版必修2',words:272,note:''},
+  {stage:'高中',edition:'沪外教版',grade:'高中',volume:'必修3',name:'沪外教版必修3',words:342,note:''},
+  {stage:'高中',edition:'沪外教版',grade:'高中',volume:'选必1',name:'沪外教版选择性必修1',words:307,note:''},
+  {stage:'高中',edition:'沪外教版',grade:'高中',volume:'选必2',name:'沪外教版选择性必修2',words:252,note:''},
+  {stage:'高中',edition:'沪外教版',grade:'高中',volume:'选必3',name:'沪外教版选择性必修3',words:216,note:''},
+  {stage:'高中',edition:'沪外教版',grade:'高中',volume:'选必4',name:'沪外教版选择性必修4',words:288,note:''},
+
+  // ===== 小学同步词库 (Images 7-19) =====
+  // 北京版（一起）
+  {stage:'小学',edition:'北京版（一起）',grade:'二年级',volume:'上',name:'北京课改版二年级英语上册',words:76,note:'一起版，北京地区较多使用'},
+  {stage:'小学',edition:'北京版（一起）',grade:'二年级',volume:'下',name:'北京课改版二年级英语下册',words:78,note:'一起版'},
+  {stage:'小学',edition:'北京版（一起）',grade:'三年级',volume:'上',name:'北京课改版三年级英语上册',words:159,note:'一起版'},
+  {stage:'小学',edition:'北京版（一起）',grade:'三年级',volume:'下',name:'【2025新】北京课改版三年级英语下册',words:146,note:'一起版'},
+  {stage:'小学',edition:'北京版（一起）',grade:'四年级',volume:'上',name:'【2025年9月新】北京课改版四年级英语上册',words:66,note:'一起版'},
+  {stage:'小学',edition:'北京版（一起）',grade:'四年级',volume:'下',name:'北京课改版四年级英语下册',words:61,note:'一起版'},
+  {stage:'小学',edition:'北京版（一起）',grade:'五年级',volume:'上',name:'【2025年9月新】北京课改版五年级英语上册',words:176,note:'一起版'},
+  {stage:'小学',edition:'北京版（一起）',grade:'五年级',volume:'下',name:'北京课改版五年级英语下册',words:64,note:'一起版'},
+  {stage:'小学',edition:'北京版（一起）',grade:'六年级',volume:'上',name:'北京课改版六年级英语上册',words:68,note:'一起版'},
+  {stage:'小学',edition:'北京版（一起）',grade:'六年级',volume:'下',name:'北京课改版六年级英语下册',words:69,note:'一起版'},
+  // 外研社版（一起）小学
+  {stage:'小学',edition:'外研社版（一起）',grade:'一年级',volume:'上',name:'外研版一年级英语上册',words:123,note:'一起版，东三省部分市会使用，如大庆等'},
+  {stage:'小学',edition:'外研社版（一起）',grade:'一年级',volume:'下',name:'外研版一年级英语下册',words:108,note:'一起版'},
+  {stage:'小学',edition:'外研社版（一起）',grade:'二年级',volume:'上',name:'外研版二年级英语上册',words:111,note:'一起版'},
+  {stage:'小学',edition:'外研社版（一起）',grade:'二年级',volume:'下',name:'外研版二年级英语下册',words:108,note:'一起版'},
+  {stage:'小学',edition:'外研社版（一起）',grade:'三年级',volume:'上',name:'外研版三年级英语上册',words:81,note:'一起版'},
+  {stage:'小学',edition:'外研社版（一起）',grade:'三年级',volume:'下',name:'外研版三年级英语下册',words:100,note:'一起版'},
+  {stage:'小学',edition:'外研社版（一起）',grade:'四年级',volume:'上',name:'外研版四年级英语上册',words:109,note:'一起版'},
+  {stage:'小学',edition:'外研社版（一起）',grade:'四年级',volume:'下',name:'外研版四年级英语下册',words:78,note:'一起版'},
+  {stage:'小学',edition:'外研社版（一起）',grade:'五年级',volume:'上',name:'外研版五年级英语上册',words:79,note:'一起版'},
+  {stage:'小学',edition:'外研社版（一起）',grade:'五年级',volume:'下',name:'外研版五年级英语下册',words:70,note:'一起版'},
+  {stage:'小学',edition:'外研社版（一起）',grade:'六年级',volume:'上',name:'外研版六年级英语上册',words:61,note:'一起版'},
+  {stage:'小学',edition:'外研社版（一起）',grade:'六年级',volume:'下',name:'外研版六年级英语下册',words:89,note:'一起版'},
+  // 外研社版新标准（三起）
+  {stage:'小学',edition:'外研社版新标准（三起）',grade:'三年级',volume:'上',name:'【2025新】外研社版（新标准）三年级上',words:208,note:'三起版'},
+  {stage:'小学',edition:'外研社版新标准（三起）',grade:'三年级',volume:'下',name:'【2025新】外研社版（新标准）三年级下',words:198,note:'三起版'},
+  {stage:'小学',edition:'外研社版新标准（三起）',grade:'四年级',volume:'上',name:'【2025年9月新】外研社版（新标准）四年级上',words:145,note:'三起版'},
+  {stage:'小学',edition:'外研社版新标准（三起）',grade:'四年级',volume:'下',name:'外研版四年级英语下册（三年级起点）',words:130,note:'三起版'},
+  {stage:'小学',edition:'外研社版新标准（三起）',grade:'五年级',volume:'上',name:'【2025年9月新】外研社版（新标准）五年级上',words:151,note:'三起版'},
+  {stage:'小学',edition:'外研社版新标准（三起）',grade:'五年级',volume:'下',name:'外研版五年级英语下册（三年级起点）',words:145,note:'三起版'},
+  {stage:'小学',edition:'外研社版新标准（三起）',grade:'六年级',volume:'上',name:'外研版六年级英语上册（三年级起点）',words:79,note:'三起版'},
+  {stage:'小学',edition:'外研社版新标准（三起）',grade:'六年级',volume:'下',name:'外研版六年级英语下册（三年级起点）',words:195,note:'三起版'},
+  // 外研社新视角版
+  {stage:'小学',edition:'外研社新视角版',grade:'三年级',volume:'上',name:'外研新视角三年级上',words:248,note:''},
+  {stage:'小学',edition:'外研社新视角版',grade:'三年级',volume:'下',name:'外研新视角三年级下',words:216,note:''},
+  {stage:'小学',edition:'外研社新视角版',grade:'四年级',volume:'上',name:'外研新视角四年级上',words:206,note:''},
+  // 外研社版Join in（三起）
+  {stage:'小学',edition:'外研社版Join in（三起）',grade:'三年级',volume:'上',name:'外研版三年级英语上册(Join in)',words:265,note:'三起版'},
+  {stage:'小学',edition:'外研社版Join in（三起）',grade:'三年级',volume:'下',name:'【2025新】外研版三年级英语下册(Join in)',words:234,note:'三起版'},
+  {stage:'小学',edition:'外研社版Join in（三起）',grade:'四年级',volume:'上',name:'【2025年9月新】外研版四年级英语上册(Join in)',words:211,note:'三起版'},
+  {stage:'小学',edition:'外研社版Join in（三起）',grade:'四年级',volume:'下',name:'外研版四年级英语下册(Join in)',words:138,note:'三起版'},
+  {stage:'小学',edition:'外研社版Join in（三起）',grade:'五年级',volume:'上',name:'外研版五年级英语上册(Join in)',words:175,note:'三起版'},
+  {stage:'小学',edition:'外研社版Join in（三起）',grade:'五年级',volume:'下',name:'外研版五年级英语下册(Join in)',words:165,note:'三起版'},
+  {stage:'小学',edition:'外研社版Join in（三起）',grade:'六年级',volume:'上',name:'外研版六年级英语上册(Join in)',words:178,note:'三起版'},
+  {stage:'小学',edition:'外研社版Join in（三起）',grade:'六年级',volume:'下',name:'外研版六年级英语下册(Join in)',words:115,note:'三起版'},
+  // 外研社版预备级（新交际2024）
+  {stage:'小学',edition:'外研社版预备级（新交际）',grade:'一年级',volume:'上',name:'【2024年新】外研新交际一年级上',words:79,note:''},
+  {stage:'小学',edition:'外研社版预备级（新交际）',grade:'一年级',volume:'下',name:'【2024年新】外研新交际一年级下',words:97,note:''},
+  {stage:'小学',edition:'外研社版预备级（新交际）',grade:'二年级',volume:'上',name:'【2024年新】外研新交际二年级上',words:67,note:''},
+  {stage:'小学',edition:'外研社版预备级（新交际）',grade:'二年级',volume:'下',name:'【2024年新】外研新交际二年级下',words:61,note:''},
+  // 外研社版2012（新交际）
+  {stage:'小学',edition:'外研社版2012（新交际）',grade:'三年级',volume:'上',name:'外研版《桂诗春》三年级英语上册',words:201,note:'三起版'},
+  {stage:'小学',edition:'外研社版2012（新交际）',grade:'三年级',volume:'下',name:'外研版《桂诗春》三年级英语下册',words:145,note:'三起版'},
+  {stage:'小学',edition:'外研社版2012（新交际）',grade:'四年级',volume:'上',name:'外研版《桂诗春》四年级英语上册',words:141,note:'三起版'},
+  {stage:'小学',edition:'外研社版2012（新交际）',grade:'四年级',volume:'下',name:'外研版《桂诗春》四年级英语下册',words:121,note:'三起版'},
+  {stage:'小学',edition:'外研社版2012（新交际）',grade:'五年级',volume:'上',name:'外研版《桂诗春》五年级英语上册',words:112,note:'三起版'},
+  {stage:'小学',edition:'外研社版2012（新交际）',grade:'五年级',volume:'下',name:'外研版《桂诗春》五年级英语下册',words:129,note:'三起版'},
+  {stage:'小学',edition:'外研社版2012（新交际）',grade:'六年级',volume:'上',name:'外研版《桂诗春》六年级英语上册',words:189,note:'三起版'},
+  {stage:'小学',edition:'外研社版2012（新交际）',grade:'六年级',volume:'下',name:'外研版《桂诗春》六年级英语下册',words:131,note:'三起版'},
+  // 译林版（一起）小学
+  {stage:'小学',edition:'译林版（一起）',grade:'一年级',volume:'上',name:'译林版一年级上',words:68,note:'一起版'},
+  {stage:'小学',edition:'译林版（一起）',grade:'一年级',volume:'下',name:'译林版一年级下',words:67,note:'一起版'},
+  {stage:'小学',edition:'译林版（一起）',grade:'二年级',volume:'上',name:'译林版二年级上',words:71,note:'一起版'},
+  {stage:'小学',edition:'译林版（一起）',grade:'二年级',volume:'下',name:'译林版二年级下',words:66,note:'一起版'},
+  {stage:'小学',edition:'译林版（一起）',grade:'三年级',volume:'上',name:'译林版三年级英语上册',words:120,note:'一起版'},
+  {stage:'小学',edition:'译林版（一起）',grade:'三年级',volume:'下',name:'【2025新】译林版三年级英语下册',words:97,note:'一起版'},
+  {stage:'小学',edition:'译林版（一起）',grade:'四年级',volume:'上',name:'【2025年9月新】译林版四年级英语上册',words:122,note:'一起版'},
+  {stage:'小学',edition:'译林版（一起）',grade:'四年级',volume:'下',name:'译林版四年级英语下册',words:118,note:'一起版'},
+  {stage:'小学',edition:'译林版（一起）',grade:'五年级',volume:'上',name:'译林版五年级英语上册',words:146,note:'一起版'},
+  {stage:'小学',edition:'译林版（一起）',grade:'五年级',volume:'下',name:'译林版五年级英语下册',words:151,note:'一起版'},
+  {stage:'小学',edition:'译林版（一起）',grade:'六年级',volume:'上',name:'译林版六年级英语上册',words:165,note:'一起版'},
+  {stage:'小学',edition:'译林版（一起）',grade:'六年级',volume:'下',name:'译林版六年级英语下册',words:116,note:'一起版'},
+  // 鲁科版（五四制）小学
+  {stage:'小学',edition:'鲁科版（五四制）',grade:'三年级',volume:'上',name:'鲁科版（五四制）三年级英语上册',words:0,note:'山东部分地区，如青岛、济南、威海等'},
+  {stage:'小学',edition:'鲁科版（五四制）',grade:'三年级',volume:'下',name:'【2025新】鲁科版（五四制）三年级英语下册',words:0,note:'五四制'},
+  {stage:'小学',edition:'鲁科版（五四制）',grade:'四年级',volume:'上',name:'2025年9月新】鲁科版（五四制）四年级英语上',words:0,note:'五四制'},
+  {stage:'小学',edition:'鲁科版（五四制）',grade:'四年级',volume:'下',name:'鲁科版（五四制）四年级英语下册',words:0,note:'五四制'},
+  {stage:'小学',edition:'鲁科版（五四制）',grade:'五年级',volume:'上',name:'鲁科版（五四制）五年级英语上册',words:0,note:'五四制'},
+  {stage:'小学',edition:'鲁科版（五四制）',grade:'五年级',volume:'下',name:'鲁科版（五四制）五年级英语下册',words:0,note:'五四制'},
+  // 闽教版（三起）
+  {stage:'小学',edition:'闽教版（三起）',grade:'三年级',volume:'上',name:'闽教版三年级英语上册',words:0,note:'福建部分地区，如厦门、福州、宁德等'},
+  {stage:'小学',edition:'闽教版（三起）',grade:'三年级',volume:'下',name:'【2025新】闽教版三年级英语下册',words:0,note:'三起版'},
+  {stage:'小学',edition:'闽教版（三起）',grade:'四年级',volume:'上',name:'【2025年9月新】闽教版四年级英语上册',words:0,note:'三起版'},
+  {stage:'小学',edition:'闽教版（三起）',grade:'四年级',volume:'下',name:'闽教版四年级英语下册',words:0,note:'三起版'},
+  {stage:'小学',edition:'闽教版（三起）',grade:'五年级',volume:'上',name:'闽教版五年级英语上册',words:0,note:'三起版'},
+  {stage:'小学',edition:'闽教版（三起）',grade:'五年级',volume:'下',name:'闽教版五年级英语下册',words:0,note:'三起版'},
+  {stage:'小学',edition:'闽教版（三起）',grade:'六年级',volume:'上',name:'闽教版六年级英语上册',words:0,note:'三起版'},
+  {stage:'小学',edition:'闽教版（三起）',grade:'六年级',volume:'下',name:'闽教版六年级英语下册',words:0,note:'三起版'},
+  // 冀教版（一起）小学
+  {stage:'小学',edition:'冀教版（一起）',grade:'一年级',volume:'上',name:'冀教版一年级英语上册',words:0,note:'一起版，河北地区较多使用'},
+  {stage:'小学',edition:'冀教版（一起）',grade:'一年级',volume:'下',name:'冀教版一年级英语下册',words:0,note:'一起版'},
+  {stage:'小学',edition:'冀教版（一起）',grade:'二年级',volume:'上',name:'冀教版二年级英语上册',words:0,note:'一起版'},
+  {stage:'小学',edition:'冀教版（一起）',grade:'二年级',volume:'下',name:'冀教版二年级英语下册',words:0,note:'一起版'},
+  {stage:'小学',edition:'冀教版（一起）',grade:'三年级',volume:'上',name:'冀教版三年级英语上册',words:0,note:'一起版'},
+  {stage:'小学',edition:'冀教版（一起）',grade:'三年级',volume:'下',name:'冀教版三年级英语下册',words:0,note:'一起版'},
+  {stage:'小学',edition:'冀教版（一起）',grade:'四年级',volume:'上',name:'冀教版四年级英语上册',words:0,note:'一起版'},
+  {stage:'小学',edition:'冀教版（一起）',grade:'四年级',volume:'下',name:'冀教版四年级英语下册',words:0,note:'一起版'},
+  {stage:'小学',edition:'冀教版（一起）',grade:'五年级',volume:'上',name:'冀教版五年级英语上册',words:0,note:'一起版'},
+  {stage:'小学',edition:'冀教版（一起）',grade:'五年级',volume:'下',name:'冀教版五年级英语下册',words:0,note:'一起版'},
+  {stage:'小学',edition:'冀教版（一起）',grade:'六年级',volume:'上',name:'冀教版六年级英语上册',words:0,note:'一起版'},
+  {stage:'小学',edition:'冀教版（一起）',grade:'六年级',volume:'下',name:'冀教版六年级英语下册',words:0,note:'一起版'},
+  // 冀教版（三起）小学
+  {stage:'小学',edition:'冀教版（三起）',grade:'三年级',volume:'上',name:'冀教版三年级英语上册（三年级起点）',words:86,note:'三起版，河北地区较多使用'},
+  {stage:'小学',edition:'冀教版（三起）',grade:'三年级',volume:'下',name:'【2025新】冀教版三年级英语下册（三年级起点）',words:90,note:'三起版'},
+  {stage:'小学',edition:'冀教版（三起）',grade:'四年级',volume:'上',name:'2025年9月新】冀教版四年级英语上册（三年级起点）',words:77,note:'三起版'},
+  {stage:'小学',edition:'冀教版（三起）',grade:'四年级',volume:'下',name:'冀教版四年级英语下册（三年级起点）',words:83,note:'三起版'},
+  {stage:'小学',edition:'冀教版（三起）',grade:'五年级',volume:'上',name:'冀教版五年级英语上册（三年级起点）',words:78,note:'三起版'},
+  {stage:'小学',edition:'冀教版（三起）',grade:'五年级',volume:'下',name:'冀教版五年级英语下册（三年级起点）',words:78,note:'三起版'},
+  {stage:'小学',edition:'冀教版（三起）',grade:'六年级',volume:'上',name:'冀教版六年级英语上册（三年级起点）',words:61,note:'三起版'},
+  {stage:'小学',edition:'冀教版（三起）',grade:'六年级',volume:'下',name:'冀教版六年级英语下册（三年级起点）',words:48,note:'三起版'},
+  // 粤教粤人版
+  {stage:'小学',edition:'粤教粤人版',grade:'三年级',volume:'上',name:'粤人版三年级英语上册',words:117,note:'三起版'},
+  {stage:'小学',edition:'粤教粤人版',grade:'三年级',volume:'下',name:'粤人版三年级英语下册',words:81,note:'三起版'},
+  {stage:'小学',edition:'粤教粤人版',grade:'四年级',volume:'上',name:'粤人版四年级英语上册',words:95,note:'三起版'},
+  {stage:'小学',edition:'粤教粤人版',grade:'四年级',volume:'下',name:'粤人版四年级英语下册',words:84,note:'三起版'},
+  {stage:'小学',edition:'粤教粤人版',grade:'五年级',volume:'上',name:'粤人版五年级英语上册',words:80,note:'三起版'},
+  {stage:'小学',edition:'粤教粤人版',grade:'五年级',volume:'下',name:'粤人版五年级英语下册',words:78,note:'三起版'},
+  {stage:'小学',edition:'粤教粤人版',grade:'六年级',volume:'上',name:'粤人版六年级英语上册',words:102,note:'三起版'},
+  {stage:'小学',edition:'粤教粤人版',grade:'六年级',volume:'下',name:'粤人版六年级英语下册',words:91,note:'三起版'},
+  // 湘少版
+  {stage:'小学',edition:'湘少版',grade:'三年级',volume:'上',name:'湘少版三年级上册英语',words:112,note:'三起版，湖南部分地区，如长沙、湘潭、衡阳等'},
+  {stage:'小学',edition:'湘少版',grade:'三年级',volume:'下',name:'【2025新】湘少版三年级下册英语',words:106,note:'三起版'},
+  {stage:'小学',edition:'湘少版',grade:'四年级',volume:'上',name:'【2025年9月新】湘少版四年级上册英语',words:88,note:'三起版'},
+  {stage:'小学',edition:'湘少版',grade:'四年级',volume:'下',name:'湘少版四年级下册英语',words:83,note:'三起版'},
+  {stage:'小学',edition:'湘少版',grade:'五年级',volume:'上',name:'湘少版五年级上册英语',words:95,note:'三起版'},
+  {stage:'小学',edition:'湘少版',grade:'五年级',volume:'下',name:'湘少版五年级下册英语',words:105,note:'三起版'},
+  {stage:'小学',edition:'湘少版',grade:'六年级',volume:'上',name:'湘少版六年级上册英语',words:79,note:'三起版'},
+  {stage:'小学',edition:'湘少版',grade:'六年级',volume:'下',name:'湘少版六年级下册英语',words:41,note:'三起版'},
+  // 教科版EEC学院
+  {stage:'小学',edition:'教科版（EEC学院）',grade:'三年级',volume:'上',name:'教科版-EEC学院三年级英语上册',words:95,note:'三起版，黑龙江部分地区，如哈尔滨、牡丹江、黑河等'},
+  {stage:'小学',edition:'教科版（EEC学院）',grade:'三年级',volume:'下',name:'【2025新】教科版-EEC学院三年级英语下册',words:122,note:'三起版'},
+  {stage:'小学',edition:'教科版（EEC学院）',grade:'四年级',volume:'上',name:'教科版-EEC学院四年级英语上册',words:97,note:'三起版'},
+  {stage:'小学',edition:'教科版（EEC学院）',grade:'四年级',volume:'下',name:'教科版-EEC学院四年级英语下册',words:122,note:'三起版'},
+  {stage:'小学',edition:'教科版（EEC学院）',grade:'五年级',volume:'上',name:'教科版-EEC学院五年级英语上册',words:109,note:'三起版'},
+  {stage:'小学',edition:'教科版（EEC学院）',grade:'五年级',volume:'下',name:'教科版-EEC学院五年级英语下册',words:160,note:'三起版'},
+  {stage:'小学',edition:'教科版（EEC学院）',grade:'六年级',volume:'上',name:'教科版-EEC学院六年级英语上册',words:151,note:'三起版'},
+  {stage:'小学',edition:'教科版（EEC学院）',grade:'六年级',volume:'下',name:'教科版-EEC学院六年级英语下册',words:119,note:'三起版'},
+  // 教科版（广州）
+  {stage:'小学',edition:'教科版（广州）',grade:'三年级',volume:'上',name:'教科版三年级英语上册',words:86,note:'三起版，广州市部分学校使用'},
+  {stage:'小学',edition:'教科版（广州）',grade:'三年级',volume:'下',name:'【2025新】教科版三年级英语下册',words:120,note:'三起版'},
+  {stage:'小学',edition:'教科版（广州）',grade:'四年级',volume:'上',name:'【2025年9月新】教科版四年级英语上册',words:176,note:'三起版'},
+  {stage:'小学',edition:'教科版（广州）',grade:'四年级',volume:'下',name:'教科版四年级英语下册',words:143,note:'三起版'},
+  {stage:'小学',edition:'教科版（广州）',grade:'五年级',volume:'上',name:'教科版五年级英语上册',words:160,note:'三起版'},
+  {stage:'小学',edition:'教科版（广州）',grade:'五年级',volume:'下',name:'教科版五年级英语下册',words:149,note:'三起版'},
+  {stage:'小学',edition:'教科版（广州）',grade:'六年级',volume:'上',name:'教科版六年级英语上册',words:132,note:'三起版'},
+  {stage:'小学',edition:'教科版（广州）',grade:'六年级',volume:'下',name:'教科版六年级英语下册',words:143,note:'三起版'},
+  // 人教版（一起）小学
+  {stage:'小学',edition:'人教版（一起）',grade:'一年级',volume:'上',name:'人教新起点一年级上册英语',words:52,note:'一起版，北京地区较多使用'},
+  {stage:'小学',edition:'人教版（一起）',grade:'一年级',volume:'下',name:'人教新起点一年级下册英语',words:45,note:'一起版'},
+  {stage:'小学',edition:'人教版（一起）',grade:'二年级',volume:'上',name:'人教新起点二年级上册英语',words:54,note:'一起版'},
+  {stage:'小学',edition:'人教版（一起）',grade:'二年级',volume:'下',name:'人教新起点二年级下册英语',words:55,note:'一起版'},
+  {stage:'小学',edition:'人教版（一起）',grade:'三年级',volume:'上',name:'人教新起点三年级上册英语',words:101,note:'一起版'},
+  {stage:'小学',edition:'人教版（一起）',grade:'三年级',volume:'下',name:'人教新起点三年级下册英语',words:84,note:'一起版'},
+  {stage:'小学',edition:'人教版（一起）',grade:'四年级',volume:'上',name:'人教新起点四年级上册英语',words:116,note:'一起版'},
+  {stage:'小学',edition:'人教版（一起）',grade:'四年级',volume:'下',name:'人教新起点四年级下册英语',words:86,note:'一起版'},
+  {stage:'小学',edition:'人教版（一起）',grade:'五年级',volume:'上',name:'人教新起点五年级上册英语',words:66,note:'一起版'},
+  {stage:'小学',edition:'人教版（一起）',grade:'五年级',volume:'下',name:'人教新起点五年级下册英语',words:91,note:'一起版'},
+  {stage:'小学',edition:'人教版（一起）',grade:'六年级',volume:'上',name:'人教新起点六年级上册英语',words:99,note:'一起版'},
+  {stage:'小学',edition:'人教版（一起）',grade:'六年级',volume:'下',name:'人教新起点六年级下册英语',words:38,note:'一起版'},
+  // 人教版（PEP）三起
+  {stage:'小学',edition:'人教版（PEP）',grade:'三年级',volume:'上',name:'人教版三年级英语上册(PEP)',words:109,note:'三起版，山西、重庆、浙江、安徽、河南、湖北等部分地区'},
+  {stage:'小学',edition:'人教版（PEP）',grade:'三年级',volume:'下',name:'（旧版）人教版三年级英语下册(PEP)',words:72,note:'旧版'},
+  {stage:'小学',edition:'人教版（PEP）',grade:'三年级',volume:'下',name:'【2025新】人教版三年级英语下册(PEP)',words:119,note:'三起版'},
+  {stage:'小学',edition:'人教版（PEP）',grade:'四年级',volume:'上',name:'【2025年9月新】人教版四年级英语上册(PEP)',words:84,note:'三起版'},
+  {stage:'小学',edition:'人教版（PEP）',grade:'四年级',volume:'下',name:'人教版四年级英语下册(PEP)',words:104,note:'三起版'},
+  {stage:'小学',edition:'人教版（PEP）',grade:'五年级',volume:'上',name:'人教版五年级英语上册(PEP)',words:130,note:'三起版'},
+  {stage:'小学',edition:'人教版（PEP）',grade:'五年级',volume:'下',name:'人教版五年级英语下册(PEP)',words:154,note:'三起版'},
+  {stage:'小学',edition:'人教版（PEP）',grade:'六年级',volume:'上',name:'人教版六年级英语上册(PEP)',words:141,note:'三起版'},
+  {stage:'小学',edition:'人教版（PEP）',grade:'六年级',volume:'下',name:'人教版六年级英语下册(PEP)',words:90,note:'三起版'},
+  // 人教版（精通）
+  {stage:'小学',edition:'人教版（精通）',grade:'三年级',volume:'上',name:'人教精通版三年级英语上册',words:133,note:'三起版'},
+  {stage:'小学',edition:'人教版（精通）',grade:'三年级',volume:'下',name:'【2025新】人教精通版三年级英语下册',words:112,note:'三起版'},
+  {stage:'小学',edition:'人教版（精通）',grade:'四年级',volume:'上',name:'【2025年9月新】人教精通版四年级英语上册',words:87,note:'三起版'},
+  {stage:'小学',edition:'人教版（精通）',grade:'四年级',volume:'下',name:'人教精通版四年级英语下册',words:122,note:'三起版'},
+  {stage:'小学',edition:'人教版（精通）',grade:'五年级',volume:'上',name:'人教精通版五年级英语上册',words:125,note:'三起版'},
+  {stage:'小学',edition:'人教版（精通）',grade:'五年级',volume:'下',name:'人教精通版五年级英语下册',words:141,note:'三起版'},
+  {stage:'小学',edition:'人教版（精通）',grade:'六年级',volume:'上',name:'人教精通版六年级英语上册',words:147,note:'三起版'},
+  {stage:'小学',edition:'人教版（精通）',grade:'六年级',volume:'下',name:'人教精通版六年级英语下册',words:81,note:'三起版'},
+  // 鲁教湘教版
+  {stage:'小学',edition:'鲁教湘教版',grade:'三年级',volume:'上',name:'鲁教湘教版三年级英语上册',words:113,note:'三起版'},
+  {stage:'小学',edition:'鲁教湘教版',grade:'三年级',volume:'下',name:'【2025新】鲁教湘教版三年级英语下册',words:121,note:'三起版'},
+  {stage:'小学',edition:'鲁教湘教版',grade:'四年级',volume:'上',name:'【2025年9月新】鲁教湘教版四年级英语上册',words:124,note:'三起版'},
+  {stage:'小学',edition:'鲁教湘教版',grade:'四年级',volume:'下',name:'鲁教湘教版四年级英语下册',words:112,note:'三起版'},
+  {stage:'小学',edition:'鲁教湘教版',grade:'五年级',volume:'上',name:'鲁教湘教版五年级英语上册',words:166,note:'三起版'},
+  {stage:'小学',edition:'鲁教湘教版',grade:'五年级',volume:'下',name:'鲁教湘教版五年级英语下册',words:133,note:'三起版'},
+  {stage:'小学',edition:'鲁教湘教版',grade:'六年级',volume:'上',name:'鲁教湘教版六年级英语上册',words:124,note:'三起版'},
+  {stage:'小学',edition:'鲁教湘教版',grade:'六年级',volume:'下',name:'鲁教湘教版六年级英语下册',words:138,note:'三起版'},
+  // 陕旅版
+  {stage:'小学',edition:'陕旅版',grade:'三年级',volume:'上',name:'陕旅版三年级英语上册',words:140,note:'三起版'},
+  {stage:'小学',edition:'陕旅版',grade:'三年级',volume:'下',name:'【2025新】陕旅版三年级英语下册',words:98,note:'三起版'},
+  {stage:'小学',edition:'陕旅版',grade:'四年级',volume:'上',name:'【2025年9月新】陕旅版四年级英语上册',words:106,note:'三起版'},
+  {stage:'小学',edition:'陕旅版',grade:'四年级',volume:'下',name:'陕旅版四年级英语下册',words:118,note:'三起版'},
+  {stage:'小学',edition:'陕旅版',grade:'五年级',volume:'上',name:'陕旅版五年级英语上册',words:102,note:'三起版'},
+  {stage:'小学',edition:'陕旅版',grade:'五年级',volume:'下',name:'陕旅版五年级英语下册',words:138,note:'三起版'},
+  {stage:'小学',edition:'陕旅版',grade:'六年级',volume:'上',name:'陕旅版六年级英语上册',words:128,note:'三起版'},
+  {stage:'小学',edition:'陕旅版',grade:'六年级',volume:'下',name:'陕旅版六年级英语下册',words:113,note:'三起版'},
+  // 沪教版口语交际
+  {stage:'小学',edition:'沪教版口语交际',grade:'一年级',volume:'上',name:'沪教版口语交际一年级上',words:110,note:'只有一、二年级'},
+  {stage:'小学',edition:'沪教版口语交际',grade:'一年级',volume:'下',name:'沪教版口语交际一年级下',words:105,note:''},
+  {stage:'小学',edition:'沪教版口语交际',grade:'二年级',volume:'上',name:'沪教版口语交际二年级上',words:109,note:''},
+  {stage:'小学',edition:'沪教版口语交际',grade:'二年级',volume:'下',name:'沪教版口语交际二年级下',words:103,note:''},
+  // 沪教版（三起）小学
+  {stage:'小学',edition:'沪教版（三起）',grade:'三年级',volume:'上',name:'沪教版三年级英语上册',words:147,note:'三起版'},
+  {stage:'小学',edition:'沪教版（三起）',grade:'三年级',volume:'下',name:'【2025新】沪教版三年级英语下册',words:156,note:'三起版'},
+  {stage:'小学',edition:'沪教版（三起）',grade:'四年级',volume:'上',name:'【2025年9月新】沪教版四年级英语上册',words:135,note:'三起版'},
+  {stage:'小学',edition:'沪教版（三起）',grade:'四年级',volume:'下',name:'沪教版四年级英语下册',words:150,note:'三起版'},
+  {stage:'小学',edition:'沪教版（三起）',grade:'五年级',volume:'上',name:'沪教版五年级英语上册',words:162,note:'三起版'},
+  {stage:'小学',edition:'沪教版（三起）',grade:'五年级',volume:'下',name:'沪教版五年级英语下册',words:160,note:'三起版'},
+  {stage:'小学',edition:'沪教版（三起）',grade:'六年级',volume:'上',name:'沪教版六年级英语上册',words:134,note:'三起版'},
+  {stage:'小学',edition:'沪教版（三起）',grade:'六年级',volume:'下',name:'沪教版六年级英语下册',words:138,note:'三起版'},
+  // 川教版
+  {stage:'小学',edition:'川教版',grade:'三年级',volume:'上',name:'川教版三年级英语上册',words:181,note:'三起版，四川部分地区，如南充、资阳等'},
+  {stage:'小学',edition:'川教版',grade:'三年级',volume:'下',name:'【2025新】川教版三年级英语下册',words:175,note:'三起版'},
+  {stage:'小学',edition:'川教版',grade:'四年级',volume:'上',name:'【2025年9月新】川教版四年级英语上册',words:124,note:'三起版'},
+  {stage:'小学',edition:'川教版',grade:'四年级',volume:'下',name:'川教版四年级英语下册',words:131,note:'三起版'},
+  {stage:'小学',edition:'川教版',grade:'五年级',volume:'上',name:'川教版五年级英语上册',words:95,note:'三起版'},
+  {stage:'小学',edition:'川教版',grade:'五年级',volume:'下',name:'川教版五年级英语下册',words:101,note:'三起版'},
+  {stage:'小学',edition:'川教版',grade:'六年级',volume:'上',name:'川教版六年级英语上册',words:134,note:'三起版'},
+  {stage:'小学',edition:'川教版',grade:'六年级',volume:'下',name:'川教版六年级英语下册',words:180,note:'三起版'},
+  // 接力版
+  {stage:'小学',edition:'接力版',grade:'三年级',volume:'上',name:'接力版三年级英语上册',words:111,note:'三起版'},
+  {stage:'小学',edition:'接力版',grade:'三年级',volume:'下',name:'【2025新】接力版三年级英语下册',words:125,note:'三起版'},
+  {stage:'小学',edition:'接力版',grade:'四年级',volume:'上',name:'【2025年9月新】接力版四年级英语上册',words:139,note:'三起版'},
+  {stage:'小学',edition:'接力版',grade:'四年级',volume:'下',name:'接力版四年级英语下册',words:107,note:'三起版'},
+  {stage:'小学',edition:'接力版',grade:'五年级',volume:'上',name:'接力版五年级英语上册',words:107,note:'三起版'},
+  {stage:'小学',edition:'接力版',grade:'五年级',volume:'下',name:'接力版五年级英语下册',words:76,note:'三起版'},
+  {stage:'小学',edition:'接力版',grade:'六年级',volume:'上',name:'接力版六年级英语上册',words:67,note:'三起版'},
+  {stage:'小学',edition:'接力版',grade:'六年级',volume:'下',name:'接力版六年级英语下册',words:48,note:'三起版'},
+  // 科普（仁爱）版小学
+  {stage:'小学',edition:'科普（仁爱）版',grade:'三年级',volume:'上',name:'仁爱版三年级英语上册（科普版）',words:151,note:'三起版'},
+  {stage:'小学',edition:'科普（仁爱）版',grade:'三年级',volume:'下',name:'【2025新】仁爱版三年级英语下册（科普版）',words:134,note:'三起版'},
+  {stage:'小学',edition:'科普（仁爱）版',grade:'四年级',volume:'上',name:'【2025年9月新】仁爱版四年级英语上册（科普版）',words:82,note:'三起版'},
+  {stage:'小学',edition:'科普（仁爱）版',grade:'四年级',volume:'下',name:'仁爱版四年级英语下册（科普版）',words:116,note:'三起版'},
+  {stage:'小学',edition:'科普（仁爱）版',grade:'五年级',volume:'上',name:'仁爱版五年级英语上册（科普版）',words:121,note:'三起版'},
+  {stage:'小学',edition:'科普（仁爱）版',grade:'五年级',volume:'下',name:'仁爱版五年级英语下册（科普版）',words:121,note:'三起版'},
+  {stage:'小学',edition:'科普（仁爱）版',grade:'六年级',volume:'上',name:'仁爱版六年级英语上册（科普版）',words:100,note:'三起版'},
+  {stage:'小学',edition:'科普（仁爱）版',grade:'六年级',volume:'下',name:'仁爱版六年级英语下册（科普版）',words:78,note:'三起版'},
+  // 辽宁师大版
+  {stage:'小学',edition:'辽宁师大版',grade:'三年级',volume:'上',name:'辽师大版三年级上册英语（三起）',words:108,note:'三起版，辽宁省部分地区，如鞍山、抚顺、盘锦等'},
+  {stage:'小学',edition:'辽宁师大版',grade:'三年级',volume:'下',name:'【2025新】辽师大版三年级下册英语（三起）',words:104,note:'三起版'},
+  {stage:'小学',edition:'辽宁师大版',grade:'四年级',volume:'上',name:'【2025年9月新】辽师大版四年级上册英语（三起）',words:74,note:'三起版'},
+  {stage:'小学',edition:'辽宁师大版',grade:'四年级',volume:'下',name:'辽师大版四年级下册英语（三起）',words:103,note:'三起版'},
+  {stage:'小学',edition:'辽宁师大版',grade:'五年级',volume:'上',name:'辽师大版五年级上册英语（三起）',words:112,note:'三起版'},
+  {stage:'小学',edition:'辽宁师大版',grade:'五年级',volume:'下',name:'辽师大版五年级下册英语（三起）',words:122,note:'三起版'},
+  {stage:'小学',edition:'辽宁师大版',grade:'六年级',volume:'上',name:'辽师大版六年级上册英语（三起）',words:118,note:'三起版'},
+  {stage:'小学',edition:'辽宁师大版',grade:'六年级',volume:'下',name:'辽师大版六年级下册英语（三起）',words:64,note:'三起版'},
+  // 清华大学版（一起）
+  {stage:'小学',edition:'清华大学版',grade:'一年级',volume:'上',name:'清华版一年级上册英语',words:106,note:'一起版'},
+  {stage:'小学',edition:'清华大学版',grade:'一年级',volume:'下',name:'清华版一年级下册英语',words:96,note:'一起版'},
+  {stage:'小学',edition:'清华大学版',grade:'二年级',volume:'上',name:'清华版二年级上册英语',words:80,note:'一起版'},
+  {stage:'小学',edition:'清华大学版',grade:'二年级',volume:'下',name:'清华版二年级下册英语',words:84,note:'一起版'},
+  {stage:'小学',edition:'清华大学版',grade:'三年级',volume:'上',name:'清华版三年级上册英语',words:171,note:'一起版'},
+  {stage:'小学',edition:'清华大学版',grade:'三年级',volume:'下',name:'【2025新】清华版三年级下册英语',words:164,note:'一起版'},
+  {stage:'小学',edition:'清华大学版',grade:'四年级',volume:'上',name:'清华版四年级上册英语',words:91,note:'一起版'},
+  {stage:'小学',edition:'清华大学版',grade:'四年级',volume:'下',name:'清华版四年级下册英语',words:97,note:'一起版'},
+  {stage:'小学',edition:'清华大学版',grade:'五年级',volume:'上',name:'清华版五年级上册英语',words:107,note:'一起版'},
+  {stage:'小学',edition:'清华大学版',grade:'五年级',volume:'下',name:'清华版五年级下册英语',words:104,note:'一起版'},
+  {stage:'小学',edition:'清华大学版',grade:'六年级',volume:'上',name:'清华版六年级上册英语',words:116,note:'一起版'},
+  {stage:'小学',edition:'清华大学版',grade:'六年级',volume:'下',name:'清华版六年级下册英语',words:108,note:'一起版'},
+  // 北师大版（一起）小学
+  {stage:'小学',edition:'北师大版（一起）',grade:'一年级',volume:'上',name:'北师大版一年级英语上册',words:68,note:'一起版'},
+  {stage:'小学',edition:'北师大版（一起）',grade:'一年级',volume:'下',name:'北师大版一年级英语下册',words:64,note:'一起版'},
+  {stage:'小学',edition:'北师大版（一起）',grade:'二年级',volume:'上',name:'北师大版二年级英语上册',words:55,note:'一起版'},
+  {stage:'小学',edition:'北师大版（一起）',grade:'二年级',volume:'下',name:'北师大版二年级英语下册',words:98,note:'一起版'},
+  {stage:'小学',edition:'北师大版（一起）',grade:'三年级',volume:'上',name:'北师大版三年级英语上册',words:65,note:'一起版'},
+  {stage:'小学',edition:'北师大版（一起）',grade:'三年级',volume:'下',name:'北师大版三年级英语下册',words:66,note:'一起版'},
+  {stage:'小学',edition:'北师大版（一起）',grade:'四年级',volume:'上',name:'北师大版四年级英语上册',words:81,note:'一起版'},
+  {stage:'小学',edition:'北师大版（一起）',grade:'四年级',volume:'下',name:'北师大版四年级英语下册',words:71,note:'一起版'},
+  {stage:'小学',edition:'北师大版（一起）',grade:'五年级',volume:'上',name:'北师大版五年级英语上册',words:104,note:'一起版'},
+  {stage:'小学',edition:'北师大版（一起）',grade:'五年级',volume:'下',name:'北师大版五年级英语下册',words:88,note:'一起版'},
+  {stage:'小学',edition:'北师大版（一起）',grade:'六年级',volume:'上',name:'北师大版六年级英语上册',words:110,note:'一起版'},
+  {stage:'小学',edition:'北师大版（一起）',grade:'六年级',volume:'下',name:'北师大版六年级英语下册',words:70,note:'一起版'},
+  // 北师大版（三起）小学
+  {stage:'小学',edition:'北师大版（三起）',grade:'三年级',volume:'上',name:'北师大版三起三年级英语上册',words:98,note:'三起版，泉州等地区使用'},
+  {stage:'小学',edition:'北师大版（三起）',grade:'三年级',volume:'下',name:'【2025新】北师大版三起三年级英语下册',words:101,note:'三起版'},
+  {stage:'小学',edition:'北师大版（三起）',grade:'四年级',volume:'上',name:'【2025年9月新】北师大版三起四年级英语上册',words:88,note:'三起版'},
+  {stage:'小学',edition:'北师大版（三起）',grade:'四年级',volume:'下',name:'北师大版三起四年级英语下册',words:98,note:'三起版'},
+  {stage:'小学',edition:'北师大版（三起）',grade:'五年级',volume:'上',name:'北师大版三起五年级英语上册',words:90,note:'三起版'},
+  {stage:'小学',edition:'北师大版（三起）',grade:'五年级',volume:'下',name:'北师大版三起五年级英语下册',words:79,note:'三起版'},
+  {stage:'小学',edition:'北师大版（三起）',grade:'六年级',volume:'上',name:'北师大版三起六年级英语上册',words:102,note:'三起版'},
+  {stage:'小学',edition:'北师大版（三起）',grade:'六年级',volume:'下',name:'北师大版三起六年级英语下册',words:39,note:'三起版'},
+  // 重庆大学版（三起）小学
+  {stage:'小学',edition:'重庆大学版（三起）',grade:'三年级',volume:'上',name:'重庆大学版三年级上',words:112,note:'三起版'},
+  {stage:'小学',edition:'重庆大学版（三起）',grade:'三年级',volume:'下',name:'重庆大学版三年级下',words:142,note:'三起版'},
+  {stage:'小学',edition:'重庆大学版（三起）',grade:'四年级',volume:'上',name:'【2025年9月新】重庆大学版四年级上',words:54,note:'三起版'},
+  {stage:'小学',edition:'重庆大学版（三起）',grade:'四年级',volume:'下',name:'重庆大学版四年级下',words:56,note:'三起版'},
+  {stage:'小学',edition:'重庆大学版（三起）',grade:'五年级',volume:'上',name:'重庆大学版五年级上',words:50,note:'三起版'},
+  {stage:'小学',edition:'重庆大学版（三起）',grade:'五年级',volume:'下',name:'重庆大学版五年级下',words:50,note:'三起版'},
+  {stage:'小学',edition:'重庆大学版（三起）',grade:'六年级',volume:'上',name:'重庆大学版六年级上',words:62,note:'三起版'},
+  {stage:'小学',edition:'重庆大学版（三起）',grade:'六年级',volume:'下',name:'重庆大学版六年级下',words:53,note:'三起版'},
+  // 牛津上海试用版（小学）
+  {stage:'小学',edition:'牛津上海试用版',grade:'一年级',volume:'上',name:'牛津上海试用版一年级上',words:50,note:''},
+  {stage:'小学',edition:'牛津上海试用版',grade:'一年级',volume:'下',name:'牛津上海试用版一年级下',words:47,note:''},
+  {stage:'小学',edition:'牛津上海试用版',grade:'二年级',volume:'上',name:'牛津上海试用版一年级上',words:41,note:''},
+  {stage:'小学',edition:'牛津上海试用版',grade:'二年级',volume:'下',name:'牛津上海试用版一年级下',words:55,note:''},
+  {stage:'小学',edition:'牛津上海试用版',grade:'三年级',volume:'上',name:'牛津上海试用版三年级上',words:249,note:''},
+  {stage:'小学',edition:'牛津上海试用版',grade:'三年级',volume:'下',name:'牛津上海试用版三年级下',words:189,note:''},
+  {stage:'小学',edition:'牛津上海试用版',grade:'四年级',volume:'上',name:'牛津上海试用版四年级上',words:276,note:''},
+  {stage:'小学',edition:'牛津上海试用版',grade:'四年级',volume:'下',name:'牛津上海试用版四年级下',words:241,note:''},
+  {stage:'小学',edition:'牛津上海试用版',grade:'五年级',volume:'上',name:'牛津上海试用版五年级上',words:198,note:''},
+  {stage:'小学',edition:'牛津上海试用版',grade:'五年级',volume:'下',name:'牛津上海试用版五年级下',words:234,note:''},
+  {stage:'小学',edition:'牛津上海试用版',grade:'六年级',volume:'上',name:'牛津上海试用版六年级上',words:201,note:''},
+  {stage:'小学',edition:'牛津上海试用版',grade:'六年级',volume:'下',name:'牛津上海试用版六年级下',words:261,note:''},
+  // 上海教育出版（小学）
+  {stage:'小学',edition:'上海教育出版',grade:'一年级',volume:'上',name:'上海教育出版一年级上',words:59,note:'五四学制'},
+  {stage:'小学',edition:'上海教育出版',grade:'一年级',volume:'下',name:'上海教育出版一年级下',words:64,note:'五四学制'},
+  // 粤教沪外版
+  {stage:'小学',edition:'粤教沪外版',grade:'三年级',volume:'上',name:'粤教沪外版三年级上',words:154,note:'三起版'},
+  {stage:'小学',edition:'粤教沪外版',grade:'三年级',volume:'下',name:'粤教沪外版三年级下',words:146,note:'三起版'},
+  // 新概念
+  {stage:'其他',edition:'新概念英语',grade:'全阶段',volume:'第一册',name:'新概念第一册',words:836,note:'经典英语教材，1997年出版'},
+  {stage:'其他',edition:'新概念英语',grade:'全阶段',volume:'第二册',name:'新概念第二册',words:822,note:'经典英语教材'},
+  {stage:'其他',edition:'新概念英语',grade:'全阶段',volume:'第三册',name:'新概念第三册',words:1031,note:'经典英语教材'},
+];
+
+// ============================================================
+//  VOCAB TAB LOGIC
+// ============================================================
+let vocabFiltered = [...vocabDB];
+let vocabPage = 1;
+const ROWS_PER_PAGE = 20;
+let vocabInited = false;
+
+function initVocabTab() {
+  if (vocabInited) return;
+  vocabInited = true;
+  // Build stats
+  const total = vocabDB.length;
+  const primCount = vocabDB.filter(v=>v.stage==='小学').length;
+  const midCount = vocabDB.filter(v=>v.stage==='初中').length;
+  const highCount = vocabDB.filter(v=>v.stage==='高中').length;
+  const editions = new Set(vocabDB.map(v=>v.edition)).size;
+  document.getElementById('vocab-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">词库总数</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#007A6E">${primCount}</div><div class="stat-label">小学词库</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#006BA6">${midCount}</div><div class="stat-label">初中词库</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#9A7000">${highCount}</div><div class="stat-label">高中词库</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#6B48B0">${editions}</div><div class="stat-label">教材版本数</div></div>
+  `;
+  // Build edition filter
+  const edSelect = document.getElementById('f-edition');
+  const allEditions = [...new Set(vocabDB.map(v=>v.edition))].sort();
+  allEditions.forEach(e => { const o = document.createElement('option'); o.value=e; o.textContent=e; edSelect.appendChild(o); });
+  // Build grade filter
+  const gradeSelect = document.getElementById('f-grade');
+  const allGrades = [...new Set(vocabDB.map(v=>v.grade))];
+  const gradeOrder = ['一年级','二年级','三年级','四年级','五年级','六年级','七年级','八年级','九年级','高中'];
+  allGrades.sort((a,b)=>gradeOrder.indexOf(a)-gradeOrder.indexOf(b));
+  allGrades.forEach(g => { const o = document.createElement('option'); o.value=g; o.textContent=g; gradeSelect.appendChild(o); });
+  filterVocab();
+}
+
+function filterVocab() {
+  const stage = document.getElementById('f-stage').value;
+  const grade = document.getElementById('f-grade').value;
+  const edition = document.getElementById('f-edition').value;
+  const volume = document.getElementById('f-volume').value;
+  const search = document.getElementById('f-search').value.toLowerCase();
+
+  vocabFiltered = vocabDB.filter(v => {
+    if (stage && !v.stage.includes(stage)) return false;
+    if (grade && v.grade !== grade) return false;
+    if (edition && v.edition !== edition) return false;
+    if (volume) {
+      if (volume === '上册' && !v.volume.includes('上')) return false;
+      if (volume === '下册' && !v.volume.includes('下')) return false;
+      if (volume === '全册' && !v.volume.includes('全')) return false;
+      if (volume === '必修' && !v.volume.includes('必修')) return false;
+      if (volume === '选必' && !v.volume.includes('选')) return false;
+    }
+    if (search && !v.name.toLowerCase().includes(search) && !v.edition.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  vocabPage = 1;
+  renderVocabTable();
+}
+
+function renderVocabTable() {
+  const tbody = document.getElementById('vocab-tbody');
+  const noResults = document.getElementById('vocab-no-results');
+  const countEl = document.getElementById('vocab-result-count');
+
+  if (vocabFiltered.length === 0) {
+    tbody.innerHTML = '';
+    noResults.style.display = 'block';
+    countEl.textContent = '无匹配结果';
+    document.getElementById('vocab-pagination').innerHTML = '';
+    return;
+  }
+  noResults.style.display = 'none';
+  const start = (vocabPage-1)*ROWS_PER_PAGE;
+  const end = Math.min(start+ROWS_PER_PAGE, vocabFiltered.length);
+  const pageData = vocabFiltered.slice(start, end);
+  countEl.textContent = `共 ${vocabFiltered.length} 条结果（第 ${start+1}-${end} 条）`;
+
+  tbody.innerHTML = pageData.map(v => {
+    const stageCls = v.stage==='小学'?'primary':v.stage==='初中'?'middle':'high';
+    const w = parseInt(v.words)||0;
+    const wordCls = w>=400?'high-count':w>=200?'mid-count':'low-count';
+    return `<tr>
+      <td><span class="vtable-level ${stageCls}">${v.stage}</span></td>
+      <td class="vtable-edition">${v.edition}</td>
+      <td style="color:#1A1A1A;font-weight:500">${v.grade}</td>
+      <td style="color:#666">${v.volume}</td>
+      <td class="vtable-name">${v.name}</td>
+      <td style="text-align:right"><span class="vtable-words ${wordCls}">${w>0?w:'—'}</span></td>
+      <td class="vtable-note">${v.note||'—'}</td>
+    </tr>`;
+  }).join('');
+
+  // Pagination
+  const totalPages = Math.ceil(vocabFiltered.length/ROWS_PER_PAGE);
+  const pag = document.getElementById('vocab-pagination');
+  if (totalPages <= 1) { pag.innerHTML=''; return; }
+  let pagHtml = '';
+  const showPages = [];
+  showPages.push(1);
+  for (let i = Math.max(2, vocabPage-2); i <= Math.min(totalPages-1, vocabPage+2); i++) showPages.push(i);
+  if (totalPages > 1) showPages.push(totalPages);
+  const uniquePages = [...new Set(showPages)].sort((a,b)=>a-b);
+  uniquePages.forEach((p,i) => {
+    if (i > 0 && p - uniquePages[i-1] > 1) pagHtml += '<span style="color:#888;padding:0 4px">…</span>';
+    pagHtml += `<div class="page-num ${p===vocabPage?'active':''}" onclick="goPage(${p})">${p}</div>`;
+  });
+  pag.innerHTML = pagHtml;
+}
+
+function goPage(p) {
+  vocabPage = p;
+  renderVocabTable();
+  document.querySelector('.vocab-table-wrap').scrollIntoView({behavior:'smooth',block:'start'});
+}
+</script>
+</body>
+</html>

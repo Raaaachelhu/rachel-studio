@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全国 K12 升学考情生成器 - 51Talk 销冠工作台 ULTRA V5</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=Oswald:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --red: #C0392B;
+            --red-dark: #96281B;
+            --red-glow: rgba(192,57,43,0.15);
+            --gold: #D4A017;
+            --gold-light: #F5D679;
+            --black: #0D0D0D;
+            --off-white: #F8F5F0;
+            --panel-bg: #1A1A1A;
+            --card-bg: #FFFFFF;
+            --text-primary: #1A1A1A;
+            --text-muted: #888;
+            --border: #E0DBD4;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background: var(--off-white);
+            font-family: 'Noto Sans SC', sans-serif;
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ─── TOP BANNER ─── */
+        .top-banner {
+            background: var(--black);
+            color: #fff;
+            padding: 10px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            letter-spacing: 1.5px;
+        }
+        .top-banner span { opacity: 0.5; }
+        .top-banner .live-dot {
+            display: inline-block; width: 7px; height: 7px; background: #2ECC71;
+            border-radius: 50%; margin-right: 6px; animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+        /* ─── HERO HEADER ─── */
+        .hero {
+            background: var(--black);
+            color: #fff;
+            padding: 50px 50px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent, transparent 40px,
+                rgba(255,255,255,0.012) 40px, rgba(255,255,255,0.012) 41px
+            );
+        }
+        .hero-inner { max-width: 1300px; margin: 0 auto; position: relative; }
+        .hero-eyebrow {
+            font-size: 11px; letter-spacing: 4px; color: var(--gold);
+            text-transform: uppercase; margin-bottom: 16px; font-weight: 600;
+        }
+        .hero h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(36px, 5vw, 58px);
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: -0.5px;
+        }
+        .hero h1 em {
+            font-style: normal;
+            color: var(--red);
+        }
+        .hero-sub {
+            margin-top: 16px; font-size: 15px; color: rgba(255,255,255,0.55);
+            max-width: 700px; line-height: 1.7;
+        }
+        .hero-stats {
+            display: flex; gap: 40px; margin-top: 30px; padding-top: 30px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .stat-item { }
+        .stat-num {
+            font-family: 'Oswald', sans-serif; font-size: 30px; color: var(--gold);
+            font-weight: 700;
+        }
+        .stat-label { font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 3px; letter-spacing: 1px; }
+
+        /* ─── MAIN LAYOUT ─── */
+        .main-wrap { max-width: 1300px; margin: 0 auto; padding: 40px 50px; }
+
+        /* ─── THEORY BOX ─── */
+        .theory-strip {
+            background: linear-gradient(135deg, #1A1A1A 0%, #2A1A1A 100%);
+            border-left: 4px solid var(--gold);
+            padding: 22px 28px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+        .theory-icon { font-size: 28px; flex-shrink: 0; margin-top: 2px; }
+        .theory-text h3 { color: var(--gold); font-size: 14px; letter-spacing: 2px; margin-bottom: 8px; font-weight: 700; }
+        .theory-text p { color: rgba(255,255,255,0.7); font-size: 13.5px; line-height: 1.7; }
+        .theory-text strong { color: #fff; }
+
+        /* ─── CONTROL PANEL ─── */
+        .control-panel {
+            background: #fff;
+            border: 1px solid var(--border);
+            padding: 32px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.04);
+        }
+        .panel-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 13px; letter-spacing: 3px; color: var(--text-muted);
+            text-transform: uppercase; margin-bottom: 24px;
+            padding-bottom: 14px; border-bottom: 1px solid var(--border);
+        }
+        .control-group { margin-bottom: 28px; }
+        .control-label {
+            font-weight: 700; font-size: 13px; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px; color: var(--black);
+        }
+        .step-badge {
+            background: var(--red); color: #fff; width: 22px; height: 22px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; flex-shrink: 0;
+        }
+
+        /* ─── FILTER BUTTONS ─── */
+        .btn-group { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .filter-btn {
+            background: #FAFAFA; border: 1.5px solid #E0DBD4;
+            padding: 10px 16px; font-size: 13px; cursor: pointer;
+            border-radius: 3px; transition: all 0.15s;
+            font-weight: 500; color: #444; line-height: 1.4;
+            font-family: 'Noto Sans SC', sans-serif;
+        }
+        .filter-btn.active {
+            background: var(--black); color: #fff;
+            border-color: var(--black);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+        .filter-btn:hover:not(.active) { border-color: var(--red); color: var(--red); background: #fff8f7; }
+        .region-desc { font-size: 11px; display: block; margin-top: 3px; opacity: 0.65; }
+        .active .region-desc { opacity: 0.55; }
+        .grade-badge-label {
+            font-size: 11px; color: #999; background: #F0EDE8;
+            padding: 3px 10px; border-radius: 12px; font-weight: 600; letter-spacing: 1px;
+        }
+        .grade-divider { width: 100%; height: 1px; background: #EEE; margin: 6px 0; }
+
+        /* ─── GENERATE BUTTON ─── */
+        .generate-btn {
+            background: var(--red); color: #fff; border: none;
+            padding: 18px 30px; font-size: 16px; font-weight: 700;
+            cursor: pointer; width: 100%; letter-spacing: 3px;
+            transition: all 0.2s; font-family: 'Noto Sans SC', sans-serif;
+            position: relative; overflow: hidden; margin-top: 8px;
+        }
+        .generate-btn::after {
+            content: '';
+            position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+            transition: left 0.4s;
+        }
+        .generate-btn:hover { background: var(--red-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(192,57,43,0.4); }
+        .generate-btn:hover::after { left: 100%; }
+
+        /* ─── RESULTS ─── */
+        #result-container { display: none; margin-top: 20px; }
+        .results-header {
+            display: flex; justify-content: space-between; align-items: flex-end;
+            border-bottom: 3px solid var(--black); padding-bottom: 14px; margin-bottom: 30px;
+        }
+        .results-header h2 {
+            font-family: 'Oswald', sans-serif; font-size: 26px; letter-spacing: 1px;
+        }
+        .results-header .read-tip {
+            font-size: 12px; color: var(--red); font-weight: 700; letter-spacing: 1px;
+        }
+
+        /* ─── TIMELINE CARD ─── */
+        .timeline-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            margin-bottom: 28px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: box-shadow 0.2s;
+        }
+        .timeline-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+
+        .card-header {
+            background: var(--black); color: #fff;
+            padding: 14px 24px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;
+        }
+        .card-time { font-family: 'Oswald', sans-serif; font-size: 18px; letter-spacing: 0.5px; }
+        .card-time .card-event { font-size: 13px; color: rgba(255,255,255,0.55); margin-left: 12px; font-family: 'Noto Sans SC', sans-serif; font-weight: 400; }
+        .card-badge {
+            padding: 5px 14px; font-size: 12px; font-weight: 700;
+            letter-spacing: 1px; border-radius: 2px;
+        }
+        .bg-crucial { background: var(--red); color: #fff; }
+        .bg-high { background: var(--gold); color: var(--black); }
+
+        .card-body { padding: 24px; display: grid; grid-template-columns: 1fr; gap: 0; }
+
+        /* Pain section */
+        .pain-section {
+            padding: 18px 20px;
+            background: #FFF8F7;
+            border-left: 4px solid var(--red);
+            margin-bottom: 20px;
+        }
+        .section-title {
+            font-size: 11px; letter-spacing: 2px; font-weight: 700;
+            color: var(--red); text-transform: uppercase; margin-bottom: 10px;
+        }
+        .pain-section p { font-size: 14px; line-height: 1.75; color: #444; }
+
+        /* Theory tags */
+        .theory-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+        .theory-tag {
+            background: #F0EDE8; color: #666; font-size: 11px;
+            padding: 4px 10px; border-radius: 2px; font-weight: 500;
+        }
+        .theory-tag.red { background: rgba(192,57,43,0.08); color: var(--red); }
+
+        /* Pitch section */
+        .pitch-main {
+            background: linear-gradient(135deg, #FFFDF5, #FFF9E6);
+            border: 1.5px solid #D4A017;
+            padding: 22px 24px;
+            margin-bottom: 16px;
+        }
+        .pitch-main .section-title { color: #8A6517; }
+        .pitch-main p { font-size: 15.5px; line-height: 1.95; color: #1A1A1A; }
+
+        /* Objection handler */
+        .objection-box {
+            background: #F0F7FF;
+            border: 1px solid #B3D1F0;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+        }
+        .objection-box .section-title { color: #1565C0; }
+        .objection-q { font-size: 13px; color: #1565C0; font-weight: 700; margin-bottom: 6px; }
+        .objection-a { font-size: 13.5px; color: #333; line-height: 1.7; }
+
+        /* Close line */
+        .close-line {
+            background: var(--black); color: #fff;
+            padding: 14px 20px;
+            display: flex; align-items: center; gap: 12px;
+        }
+        .close-line-label { font-size: 11px; color: var(--gold); letter-spacing: 2px; flex-shrink: 0; font-weight: 700; }
+        .close-line-text { font-size: 14px; line-height: 1.6; font-weight: 500; }
+
+        /* Data proof */
+        .data-proof {
+            display: flex; gap: 12px; flex-wrap: wrap; padding: 16px 20px;
+            border-top: 1px dashed var(--border); background: #FAFAFA;
+        }
+        .proof-item {
+            background: #fff; border: 1px solid var(--border);
+            padding: 10px 14px; border-radius: 3px; flex: 1; min-width: 130px;
+        }
+        .proof-num { font-family: 'Oswald', sans-serif; font-size: 22px; color: var(--red); font-weight: 700; }
+        .proof-desc { font-size: 11px; color: #888; margin-top: 2px; }
+
+        /* Text highlight styles */
+        .text-red { color: var(--red); font-weight: 700; }
+        .text-gold { color: var(--gold); font-weight: 700; }
+        .text-mark {
+            background: linear-gradient(180deg, transparent 55%, rgba(212,160,23,0.3) 55%);
+            font-weight: 700;
+        }
+        .text-crisis { color: var(--red); font-weight: 700; font-style: italic; }
+
+        /* Footer */
+        .footer-note {
+            text-align: center; padding: 30px; color: #BBB; font-size: 12px;
+            border-top: 1px solid var(--border); margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .hero, .main-wrap { padding: 30px 20px; }
+            .top-banner { padding: 10px 20px; }
+            .hero-stats { gap: 20px; flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-banner">
+    <span><span class="live-dot"></span>LIVE · 51Talk 销冠工作台 V5.0 ULTRA MAX</span>
+    <span>覆盖34省 · 11学段 · 每张卡含话术+异议处理+成交收口</span>
+    <span style="opacity:1; color: var(--gold-light); font-weight:600; letter-spacing:1px;">Dev: Rachel Hu</span>
+</div>
+
+<div class="hero">
+    <div class="hero-inner">
+        <div class="hero-eyebrow">LPC PRECISION SALES ENGINE · 极细颗粒度考情话术系统</div>
+        <h1>让每一个家长<br>在<em>3分钟内</em>感到<em>危机</em></h1>
+        <p class="hero-sub">基于全国34省考情数据 · 11学段精准拆解 · 每张话术卡含「痛点注入→理论背书→金句连招→异议击破→成交收口」五段式闭环</p>
+        <div class="hero-stats">
+            <div class="stat-item"><div class="stat-num">11</div><div class="stat-label">精细学段</div></div>
+            <div class="stat-item"><div class="stat-num">4</div><div class="stat-label">战区模式</div></div>
+            <div class="stat-item"><div class="stat-num">176+</div><div class="stat-label">实战话术卡</div></div>
+            <div class="stat-item"><div class="stat-num">∞</div><div class="stat-label">成交组合拳</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="main-wrap">
+
+    <!-- 理论武器库 -->
+    <div class="theory-strip">
+        <div class="theory-icon">🧠</div>
+        <div class="theory-text">
+            <h3>销冠心理学武器库 · 使用前必读</h3>
+            <p>
+                <strong>①损失规避效应：</strong>让家长感受到"不买=损失"比"买=获得"更有力——话术永远从"孩子在流失什么"切入。
+                &nbsp;&nbsp;<strong>②具体数字锚定：</strong>说"1分干掉1.2万人"比"很竞争"击穿效果强10倍。
+                &nbsp;&nbsp;<strong>③时间紧迫性：</strong>每句话必须绑定一个具体考试节点，"还有X天"比"早点开始"推动力强5倍。
+                &nbsp;&nbsp;<strong>④社会认同：</strong>"您楼栋/班级里的孩子已经在用了"是最便宜的成交药。
+                &nbsp;&nbsp;<strong>⑤权威背书：</strong>引用艾宾浩斯/认知负荷理论，让家长感觉买的是科学。
+            </p>
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <div class="panel-title">▸ STEP 1-3 · 配置参数，生成专属杀招</div>
+
+        <!-- 战区 -->
+        <div class="control-group">
+            <div class="control-label"><span class="step-badge">1</span>选择考生所在战区（决定危机感等级与数据引用）</div>
+            <div class="btn-group" id="region-group">
+                <button class="filter-btn active" data-val="elite">🔥 素质前沿区<span class="region-desc">北京/上海/天津/江浙/海南</span></button>
+                <button class="filter-btn" data-val="hell">☠️ 地狱卷王区<span class="region-desc">河南/山东/河北/四川/广东/湖南</span></button>
+                <button class="filter-btn" data-val="hardcore">⚔️ 硬核拼分区<span class="region-desc">湖北/安徽/江西/福建/陕西/重庆</span></button>
+                <button class="filter-btn" data-val="frontier">⛰️ 潜力逆袭区<span class="region-desc">东北三省/西北西南/港澳台</span></button>
+            </div>
+        </div>
+
+        <!-- 学段 -->
+        <div class="control-group">
+            <div class="control-label"><span class="step-badge">2</span>选择客户孩子的精确学年段（必选一个）</div>
+            <div class="btn-group" id="grade-group">
+                <span class="grade-badge-label">小学</span>
+                <button class="filter-btn active" data-val="p12">1-2年级</button>
+                <button class="filter-btn" data-val="p3">3年级</button>
+                <button class="filter-btn" data-val="p4">4年级</button>
+                <button class="filter-btn" data-val="p5">5年级</button>
+                <button class="filter-btn" data-val="p6">6年级</button>
+                <div class="grade-divider"></div>
+                <span class="grade-badge-label">初中</span>
+                <button class="filter-btn" data-val="j1">初一</button>
+                <button class="filter-btn" data-val="j2">初二</button>
+                <button class="filter-btn" data-val="j3">初三</button>
+                <div class="grade-divider"></div>
+                <span class="grade-badge-label">高中</span>
+                <button class="filter-btn" data-val="s1">高一</button>
+                <button class="filter-btn" data-val="s2">高二</button>
+                <button class="filter-btn" data-val="s3">高三</button>
+            </div>
+        </div>
+
+        <!-- 月份 -->
+        <div class="control-group">
+            <div class="control-label"><span class="step-badge">3</span>选择跟进月份（可多选）</div>
+            <div class="btn-group" id="month-group">
+                <button class="filter-btn active" data-val="m3">3月 · 开学定调</button>
+                <button class="filter-btn active" data-val="m4">4月 · 期中大考</button>
+                <button class="filter-btn active" data-val="m5">5月 · 摸底冲刺</button>
+                <button class="filter-btn active" data-val="m6">6月 · 中高考月</button>
+            </div>
+        </div>
+
+        <button class="generate-btn" onclick="generateTimeline()">⚡ 启动精密雷达 · 生成五段式杀招话术卡</button>
+    </div>
+
+    <div id="result-container">
+        <div class="results-header">
+            <h2>📋 专属实战话术卡 · <span style="color:var(--red);">红字重读，直接念出压迫感</span></h2>
+            <div class="read-tip">★ 每卡含：痛点→理论→金句→异议→成交</div>
+        </div>
+        <div id="timeline-list"></div>
+    </div>
+
+    <div class="footer-note">51Talk 销冠工作台 V5.0 ULTRA MAX · 内部培训资料 · 禁止外传</div>
+</div>
+
+<script>
+// ─── RADIO / TOGGLE SETUP ───────────────────────────────────────
+function setupRadio(id) {
+    document.querySelectorAll(`#${id} button`).forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll(`#${id} button`).forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+        });
+    });
+}
+setupRadio('region-group');
+setupRadio('grade-group');
+document.querySelectorAll('#month-group button').forEach(btn => {
+    btn.addEventListener('click', function() { this.classList.toggle('active'); });
+});
+
+// ─── REGION DATA ────────────────────────────────────────────────
+const regionData = {
+    elite: {
+        crisis: "咱们这边是<strong>全国课改'素质前沿区'</strong>，教辅资料里全是超纲词，光靠课本根本不够用",
+        data1: "北京中考英语满分120，<strong>均分已超100分</strong>，没有词汇量只能内卷均分线",
+        data2: "<strong>超60%</strong>的上海重点高中学生词汇量超过5000",
+        exam: "中高考改革考'深度阅读'，语篇长度年年增加",
+    },
+    hell: {
+        crisis: "咱们省可是全国公认的<strong>'地狱卷王区'</strong>，一分干掉上万人，大家都知道",
+        data1: "河南高考报名人数超<strong>130万</strong>，英语拖后腿=直接掉一个档次",
+        data2: "山东2024年高考英语平均分<strong>只有88分</strong>，最容易成为拉胯科目",
+        exam: "五五分流，中考直接淘汰一半孩子去职高",
+    },
+    hardcore: {
+        crisis: "咱们省拼的是<strong>硬核裸分</strong>，理化差距不大，英语就是把名次拉开的'大腿学科'",
+        data1: "湖北高考竞争激烈，<strong>英语1分≈全省2000名</strong>的排名差距",
+        data2: "安徽中考英语<strong>150分制</strong>，满分极少，高分段每分必争",
+        exam: "理科内卷严重，文理通吃的英语反而是最快提分路径",
+    },
+    frontier: {
+        crisis: "咱们省<strong>英语普遍偏弱</strong>，这反而是大机会——只要把英语补上来，总分立刻跨越一个大档次",
+        data1: "东北三省理科生英语平均分普遍<strong>低于全国均分10分以上</strong>",
+        data2: "新疆/内蒙高考生中，<strong>英语差距是理科生拉开档次的最大变量</strong>",
+        exam: "双语教育政策推进，口语和词汇量越来越重要",
+    }
+};
+
+// ─── FULL DATABASE ───────────────────────────────────────────────
+const database = {
+
+"p12": [
+    {
+        month:"m3", time:"3月上旬", event:"春季开学初体验",
+        importance:"bg-high", impText:"黄金习惯期",
+        theory:["双减政策盲区","三年级断崖效应","启蒙敏感期"],
+        pain:"双减下1-2年级不许纸笔考试，绝大多数家长陷入'快乐教育'幻觉，以为孩子没压力就没问题。事实上这是词汇积累的'黄金真空期'——别人家孩子悄悄在积累，等三年级一考试立刻断崖分化。",
+        pitch:"妈妈您好！一二年级虽然不考试，但这恰恰是最可怕的！<strong>'{region_crisis}'</strong>！您知道为什么三年级英语第一次测验，班里有的孩子考95、有的孩子只考50吗？差的就是这两年悄悄积累的词汇底子。现在没有考试压力，是最好的建立体系、积累词汇的时机。我们系统用<strong>图片联想+场景游戏</strong>让孩子不知不觉每天学15-20个词，完全没有痛苦。三年级正式学英语，别人还在适应，您孩子已经是班里站得最稳的那个！",
+        objections:[
+            {q:"孩子才一年级，现在学太早了吧？",a:"妈妈，语言学习最佳年龄窗口是3-8岁，神经科学研究证明这个阶段大脑语言区最活跃、记忆最牢固。一二年级正好在窗口期内，现在开始是'顺势而为'，等三年级再开始是'逆水行舟'。"},
+            {q:"学校说双减减负，现在补课是不是不对？",a:"双减减的是学科重复刷题，我们做的是能力建设。就像学骑自行车不叫'提前学'——这是孩子成长的基础能力，不是超前刷题。"}
+        ],
+        close:"妈妈，您今天最大的投资不是课程费用，是避免三年级断崖这件事。您孩子班里现在至少有3个家长已经在帮孩子悄悄积累了，您是要追还是要领跑，就看这个决定了。",
+        proofs:[{num:"85%",desc:"三年级滑坡来自词汇空白"},{num:"8岁",desc:"语言敏感期关键节点"},{num:"2年",desc:"提前积累的时间窗口"}]
+    },
+    {
+        month:"m4", time:"4月", event:"无纸笔阶段性摸底",
+        importance:"bg-high", impText:"兴趣保护期",
+        theory:["认知负荷理论","遗忘曲线规律","游戏化学习"],
+        pain:"家长开始着急，用课本单词表让孩子死记硬背拼写，孩子极度抗拒，产生英语焦虑。这种焦虑一旦形成就很难消除，并且持续影响整个小学阶段的英语态度。",
+        pitch:"妈妈，您有没有发现，让孩子背单词是最低效的一件事？<strong>艾宾浩斯遗忘曲线</strong>告诉我们，孤立记忆的单词，一天后忘掉70%，三天后忘掉90%——死背是真的白背！我们51Talk的系统通过<strong>AI智能间隔复习</strong>，在孩子'快忘未忘'的临界时刻精准推送，用游戏化闯关方式强化记忆，单词记忆留存率提升<strong>4倍以上</strong>。孩子不觉得在'背单词'，他觉得在'玩'，但词汇量每天都在长！",
+        objections:[
+            {q:"我们已经在用某某软件了",a:"软件是工具，真人是教练。孩子用软件大概率是敷衍几下就关掉了。我们的真人老师1v1陪伴，每节课核心词汇即时跟踪反馈，完全不一样的体验和效果。"},
+            {q:"费用太高了",a:"妈妈，我帮您算一笔账。如果孩子因为词汇底子差，三年级期末考了70分，家长的焦虑、后期补课的费用、孩子的自信心损失，这个代价比我们的费用高多少倍？"}
+        ],
+        close:"现在下单，我帮您锁定假期档期的黄金老师资源。每到换季开学前都是抢名额的高峰，您今天确认的话我可以给您留一个最好的时段。",
+        proofs:[{num:"90%",desc:"死记硬背3天后遗忘率"},{num:"4×",desc:"间隔复习留存率提升"},{num:"21天",desc:"习惯养成最短周期"}]
+    },
+    {
+        month:"m5", time:"5月", event:"口语交际月",
+        importance:"bg-high", impText:"听说基础期",
+        theory:["语言习得自然顺序","音韵意识发展","输入假说"],
+        pain:"只会认字不会读，彻底哑巴英语。音标没打好，后续拼读完全靠死记，对单词的恐惧感越来越强。",
+        pitch:"妈妈，Krashen语言习得理论说得很清楚：<strong>自然语言学习顺序是'听→说→读→写'</strong>，但学校英语课正好反过来，先教拼写。所以您孩子认识单词却读不出来，完全正常——是教学顺序出了问题，不是孩子的问题！我们的真人老师专门做<strong>1v1口语纠音</strong>，通过大量真实对话输入，先把音标和自然拼读的底子打牢。孩子能听懂、能说出，后面的读写就是水到渠成。",
+        objections:[
+            {q:"孩子很内向，不愿意开口说英语",a:"这正是需要1v1的原因！在班级课堂里，内向的孩子根本不开口，但在专属的私教空间，老师会特别设计让孩子有话可说的场景，三节课之内一定能看到孩子开口的变化。"},
+        ],
+        close:"我们这个月正好有'亲子口语体验课'活动，您带孩子来试试，让孩子自己感受一下，比我说一百句都有说服力。",
+        proofs:[{num:"1v1",desc:"专属纠音环境"},{num:"3节",desc:"开口障碍突破周期"},{num:"6岁起",desc:"音韵意识黄金窗口"}]
+    },
+    {
+        month:"m6", time:"6月下旬", event:"一年级/二年级期末",
+        importance:"bg-crucial", impText:"三年级前夜",
+        theory:["暑假滑坡效应","关键期理论","认知加速器"],
+        pain:"期末一结束家长放松，但暑假正是三年级分化的前夜。别人家在悄悄备战，自己家孩子在旅游玩耍，开学直接被甩开一截。",
+        pitch:"妈妈！期末考完您可能觉得可以松口气了，<strong>但这个暑假是整个小学阶段最关键的弯道超车时机</strong>！下学期进三年级，英语正式成为主科，第一次小测验就是'大洗牌'。<strong>'{region_crisis}'</strong>，现在班里只要有三分之一家长帮孩子在暑假备战，开学就是一场碾压。用我们系统，每天只需<strong>15-20分钟</strong>，两个月把三年级核心词汇全部前置拿下，开学第一天就是班里的'英语小达人'！",
+        objections:[
+            {q:"暑假就让孩子玩吧，太辛苦了",a:"妈妈，我完全理解这个心情，孩子确实要休息。我们的系统每天只需要15分钟，跟刷抖音的时间一样多，而且是游戏化的，孩子根本不觉得辛苦。剩下23小时45分钟完全自由！"},
+        ],
+        close:"暑假班名额现在开始抢，我给您推荐的这个老师档期，下周一就满了。您今天确认，我帮您卡住最好的时段。",
+        proofs:[{num:"40%",desc:"暑假不学的词汇遗忘率"},{num:"15分钟",desc:"每日最短有效学习时长"},{num:"200词",desc:"两月可完成词汇储备"}]
+    }
+],
+
+"p3": [
+    {
+        month:"m3", time:"3月上旬", event:"三年级下开学测",
+        importance:"bg-crucial", impText:"三年级滑坡",
+        theory:["三年级现象","认知超载","艾宾浩斯曲线"],
+        pain:"英语正式变为主科，词汇量激增，题型出现阅读理解和完形填空。没有在1-2年级积累词汇的孩子，第一次测验直接暴露词汇空白，产生英语恐惧，形成恶性循环。",
+        pitch:"妈妈，三年级有个全国性现象叫<strong>'三年级滑坡'</strong>，专门说的就是以前成绩不错的孩子，进三年级英语后突然掉下来，为什么？<strong>'{region_crisis}'</strong>！单词从几十个暴增到几百个，纯靠死背根本撑不住。我们51Talk系统有个核心黑科技叫<strong>'6+N抗遗忘模型'</strong>：新单词学完后，在第1天、第3天、第7天、第14天、第30天精准推送复习——每次复习只需要1分钟，但记忆留存率高达<strong>95%以上</strong>。三年级的坡，用科学方法根本不用爬，直接平着过去！",
+        objections:[
+            {q:"学校也在教，多上课是不是重复了？",a:"学校是30人大班，老师一节课能顾到每个孩子几分钟？我们1v1，每一分钟都是专属于您孩子的，针对他不会的词精准补漏，这是完全不同的事情。"},
+            {q:"先看看期中考完再说",a:"妈妈，等期中考完，问题已经暴露了，补救的代价是现在预防的3倍。三年级的词汇底子，现在不打，后面每个年级都要还债。"}
+        ],
+        close:"我能看出来您是非常负责任的家长。负责任就是在问题变大之前提前行动。现在报名，可以直接从本周开始上课，把三年级开学的第一波词汇彻底拿下。",
+        proofs:[{num:"95%",desc:"6+N模型词汇留存率"},{num:"78%",desc:"三年级英语滑坡比例"},{num:"40词",desc:"每节课精准掌握量"}]
+    },
+    {
+        month:"m4", time:"4月", event:"三年级期中统考",
+        importance:"bg-crucial", impText:"期中定位",
+        theory:["形成性评价","错误分析理论","间隔练习"],
+        pain:"完形填空和短文阅读开始出现，孩子的错误主要集中在'认识每个词但不懂句子意思'——这是词汇脱离语境记忆的必然结果。",
+        pitch:"妈妈，孩子期中考如果阅读题丢分，90%的原因不是读不懂语法，而是<strong>遇到了不认识的词</strong>！这叫'词汇覆盖率不足'——语言学研究表明，一篇文章里超过<strong>5%的词是生词，理解就直接断裂</strong>。我们的系统在学完词汇后，会自动生成一篇包含这些词的<strong>定制阅读短文</strong>，让孩子在真实语境里见到单词，而不是靠死背拼写。期中考的阅读题，只要词认识，分自然就回来了！",
+        objections:[
+            {q:"孩子这次考了82分，还好吧",a:"妈妈，82分是结果，我们要看的是趋势。82分里面阅读扣了几分？这次阅读题还比较简单，三四年级阅读难度每学期都在涨，现在不把词汇底子补上，每次考试都会再丢几分。"},
+        ],
+        close:"这次期中考的成绩单我们可以一起分析，您把错题拍给我，我帮您精准定位词汇缺口，我们再给孩子制定一个'靶向补漏'的计划，下次期中成绩一定能看到进步。",
+        proofs:[{num:"5%",desc:"生词比例超标导致理解断裂"},{num:"82%",desc:"阅读失分源自词汇不足"},{num:"3倍",desc:"语境记忆效率提升"}]
+    },
+    {
+        month:"m5", time:"5月", event:"三年级校内月考",
+        importance:"bg-high", impText:"阅读起步",
+        theory:["词汇覆盖理论","分级阅读","输出假说"],
+        pain:"老师开始布置阅读作业，孩子自己读一篇短文能读下来，但问到意思完全答不上——因为词汇认识率不够，凑不出语义。",
+        pitch:"妈妈，三年级的孩子开始接触阅读理解了。您孩子在家自己读英语短文，是不是读了半天答不出问题？这叫<strong>'解码障碍'</strong>——词认识，但脑子里调不出意思，就是因为词汇不是从语境中学来的。我们51Talk做的一件事就是：每天学的词，当天就放进故事场景里用。<strong>孩子不是在'学英语'，是在'用英语听故事、做任务'</strong>，词汇自然就有了温度，阅读理解直接开窍。",
+        objections:[
+            {q:"孩子现在阅读还好，先观察一下",a:"妈妈，三年级阅读还好，是因为文章都很简单。四年级开始，长句子、复杂时态会大量出现，到时候再发现问题，时间成本就高了。趁现在词汇要求还不高，把底子打好，是最经济的选择。"},
+        ],
+        close:"我们有一套'三年级阅读起飞计划'，专门对标这个学段的阅读考点，3个月内把阅读理解拉到年级前20%。我帮您打包一个来看看？",
+        proofs:[{num:"3年级",desc:"阅读理解能力关键建立期"},{num:"200词",desc:"三下必掌握核心词量"},{num:"90%",desc:"语境学习词汇保留率"}]
+    },
+    {
+        month:"m6", time:"6月", event:"三年级期末统考",
+        importance:"bg-crucial", impText:"四年级衔接",
+        theory:["暑假学习回退","认知发展衔接","螺旋课程"],
+        pain:"三年级期末成绩影响四年级班级定位。同时暑假如果停学，开学词汇遗忘严重，四年级第一个月重新熟悉的代价极大。",
+        pitch:"三年级期末考完，很多家长以为可以彻底放松了——<strong>这是最危险的错觉</strong>！{region_crisis}！研究表明，<strong>暑假两个月不学习，孩子平均遗忘当年学习内容的35-40%</strong>，开学就要花一个月重新补，然后再花一个月追四年级的新内容，孩子直接累成双倍。我们的暑假计划很简单：<strong>每天15分钟，用'6+N抗遗忘系统'复习三年级词汇，同时预习四年级高频词</strong>。开学第一天就是班里最从容的那个孩子！",
+        objections:[
+            {q:"暑假要出去旅游，没时间",a:"妈妈，我们的系统完全手机端操作，在路上、在酒店、等饭的时候都能学。15分钟不需要专门坐在书桌前，旅游和学习完全不冲突的。"},
+        ],
+        close:"我们暑假班7月1号开课，名额每年都在开课前就满了。您今天确定的话，我帮您优先锁定档期，同时给您孩子做一个暑期词汇追踪档案，开学时有一份完整进度报告，给您看到实实在在的效果。",
+        proofs:[{num:"40%",desc:"暑假平均词汇遗忘率"},{num:"1个月",desc:"开学补漏消耗的时间成本"},{num:"15分钟",desc:"每日维持学习连贯性"}]
+    }
+],
+
+"p5": [
+    {
+        month:"m3", time:"3月上旬", event:"五年级下开学考",
+        importance:"bg-crucial", impText:"小升初暗战",
+        theory:["选拔机制","超前学习效应","资源竞争"],
+        pain:"很多家长以为小升初靠摇号，放松了英语备战。但现实是：私立初中、公办重点班在明里暗里进行英语超前测试，要求孩子达到初一甚至初二词汇水平。",
+        pitch:"妈妈！五下学期，<strong>小升初的暗战已经全面打响</strong>！表面上是按成绩或摇号，但您知道那些考特招、上附属实验班的孩子，早在四年级就开始备战了吗？<strong>'{region_crisis}'</strong>！那些测试卷的词汇，全是初中水平！您孩子现在的词汇量能应对吗？我们要做的事情非常清晰：<strong>用这一学期把小学大纲词全部清零，同时提前渗透初中1500基础词汇</strong>。不是让孩子累，是让孩子在关键时刻不被卡住。",
+        objections:[
+            {q:"我们学区很好，直接对口升学不用担心",a:"妈妈，对口升学没问题，但进去之后会'分班'！分班考直接决定孩子是进重点班还是普通班，这三年的教学资源、老师精力投入差距是天壤之别。词汇量好的孩子在分班考里稳稳胜出。"},
+            {q:"现在报班太多，孩子太累了",a:"我们的系统不是增加孩子的学习时间，而是把原来用来死记硬背的时间，用科学方法替代。孩子总时间不变，但词汇量以3倍速度增长。"}
+        ],
+        close:"我们有专门针对五六年级的'小升初词汇突破计划'，覆盖小学高频词+初中入门词，3个月高强度，直接把词汇量拉到能应对分班考的水平。今天确认，下周可以开始上课了。",
+        proofs:[{num:"1500词",desc:"重点初中分班考词汇基准线"},{num:"3倍",desc:"系统学习vs死记硬背效率差"},{num:"6个月",desc:"五下+暑假备战黄金窗口"}]
+    },
+    {
+        month:"m4", time:"4月", event:"五年级下期中统考",
+        importance:"bg-crucial", impText:"名校简历材料",
+        theory:["认知发展","学科基础建构","正向强化"],
+        pain:"五年级下期中成绩是不少名初构建生源档案的重要参考节点，英语低于90分直接在首轮筛选中出局。",
+        pitch:"妈妈，您知道那些名初点招、夏令营的标准是什么吗？<strong>不是哪门课最强，而是英语有没有拖后腿</strong>！因为英语是衡量综合素质的核心维度，很多学校就拿英语成绩做第一道筛选。五年级下学期的期中成绩，现在就要开始发力了。我们针对期中考点进行<strong>'靶向词汇突破'</strong>：把高频考点词、易混淆词、完形热词三大类优先攻克，期中考分分必争，绝不让英语成为拦路石。",
+        objections:[
+            {q:"孩子其他科目成绩很好，英语差点问题不大",a:"妈妈，正是因为其他科目好，英语才更不能差！好学校招的是'综合优质生'，数学竞赛奖+英语成绩亮眼，这个组合才是最有竞争力的简历。英语一旦明显弱，整个档案就被扣分了。"},
+        ],
+        close:"我们这有个五下期中'冲刺词汇包'，40天专攻期中考高频词汇，上次用的家长反映孩子分数平均提了12分。我帮您安排一个免费诊断课，看看孩子的词汇缺口在哪里？",
+        proofs:[{num:"12分",desc:"针对性词汇冲刺平均提升"},{num:"90分",desc:"名初英语第一道筛选线"},{num:"40天",desc:"期中冲刺有效备战周期"}]
+    },
+    {
+        month:"m5", time:"5月", event:"五年级下期中~期末冲刺",
+        importance:"bg-crucial", impText:"档案关键期",
+        theory:["积累效应","选择性注意","元认知策略"],
+        pain:"这是小升初备战最后的黄金冲刺期。不少好学校5月就开始通知面谈，孩子的全英文面试能力瞬间变成关键硬实力。",
+        pitch:"妈妈！很多家长不知道，<strong>5月份是名初'暗招'的高峰期</strong>！被邀请到学校'参观交流'、'能力测评'的孩子，你以为是玩？那就是变相面试！全程英语提问，考察孩子的英语临场反应能力。我们1v1真人老师最擅长的就是模拟这种高压场景，<strong>把孩子训练成能脱口而出、不慌不乱的应试状态</strong>。词汇量是底气，临场反应是包装，两个一结合，面试绝对加分！",
+        objections:[
+            {q:"孩子英语口语没问题，就是词汇量差一点",a:"妈妈，口语流利是很大优势，但面试中会遇到专业词汇的表达场景。词汇量不够的话，表达会卡壳，反而让好印象打折扣。两者要一起练才是满分状态。"},
+        ],
+        close:"我这里有去年参加这类面试的家长反馈，他们的孩子提前两个月练了口语和词汇，面试时明显比其他孩子从容。这个时机真的很关键，错过了就没有了。",
+        proofs:[{num:"5月",desc:"名初暗招高峰期"},{num:"全英文",desc:"优质初中面试标配"},{num:"2个月",desc:"面试应答能力建立周期"}]
+    },
+    {
+        month:"m6", time:"6月", event:"五年级期末（小升初关键节点）",
+        importance:"bg-crucial", impText:"直升材料",
+        theory:["终结性评价","竞争压力","战略规划"],
+        pain:"五下期末成绩表是小升初投递最核心的材料之一，英语不满90-95分，在海量候选人中毫无竞争力。",
+        pitch:"妈妈，我必须非常直接告诉您：<strong>五年级期末成绩单，是小升初申请最重要的一张纸！</strong> {region_crisis}！英语低于90分，进入审核系统的第一关就被过滤了。现在还有不到8周时间，我们做一件事：<strong>精准攻克五下期末英语高频考点词，阅读理解靶向突破</strong>。真人老师1v1带着孩子把所有易错词、形近词、完形热词过两遍，期末一战，英语绝对不能成为孩子简历上的短板！",
+        objections:[
+            {q:"期末考试用学校老师的资料复习就够了",a:"学校老师是30个人的进度，不会专门针对您孩子的薄弱点。我们做的是精准定位孩子词汇缺口，只攻最容易失分的地方，效率是自己复习的5倍。"},
+        ],
+        close:"期末前这8周，我建议集中冲刺16节课，专攻期末考点词汇。很多家长说这16节课的投入，值过之前整学期的学习成果。我帮您排一个课程计划来看看？",
+        proofs:[{num:"95分",desc:"顶级初中英语入档门槛"},{num:"8周",desc:"期末冲刺最佳备战窗口"},{num:"16节",desc:"精准补漏课程推荐量"}]
+    }
+],
+
+"p6": [
+    {
+        month:"m3", time:"3月", event:"六年级小升初密考期",
+        importance:"bg-crucial", impText:"暗战冲刺",
+        theory:["选拔竞争","超前备战","词汇阈值"],
+        pain:"部分私立/名公办特长班进行地下选拔，考题全是初中难度。很多孩子连题干都看不懂，直接淘汰。",
+        pitch:"妈妈！六年级下学期已经是小升初最后的冲刺窗口了！<strong>'{region_crisis}'</strong>！那些暗招考卷，真的不是小学难度——复杂时态、初中词汇、长篇阅读全上。我们用51Talk系统做一件事：<strong>在最短时间内突击初中1500核心词</strong>，让孩子拿到卷子能看懂题干，看懂题干才有答题的机会。哪怕考不进那个班，初中开学的分班考也稳了！",
+        objections:[
+            {q:"我们已经确定直升了，不用担心",a:"妈妈，直升只是进了门，进门之后的分班考才是第一道真正的关卡。火箭班vs普通班，三年的教学资源和班级氛围，会直接影响孩子未来的轨迹。"},
+        ],
+        close:"我们有专门的'小升初词汇突击月'课程，30天600词，实战对接小升初/分班考题型。6月前完成，开学稳进重点班。这个档期剩下的位置不多了，您今天能确认吗？",
+        proofs:[{num:"600词",desc:"30天突击初中词汇目标量"},{num:"初中难度",desc:"暗招/分班考真实考查等级"},{num:"1个月",desc:"突击冲刺窗口期"}]
+    },
+    {
+        month:"m6", time:"6月下旬", event:"小学毕业/分班考前夕",
+        importance:"bg-crucial", impText:"火箭班入场券",
+        theory:["班级效应","马太效应","起跑线竞争"],
+        pain:"小学毕业后，孩子以为可以彻底玩了，但8月份初中分班考悄悄到来。火箭班vs普通班的差距将延续整个初中三年。",
+        pitch:"妈妈，我要说一件让很多家长后悔的事：<strong>小学毕业一考完，绝大多数家长就带着孩子出去玩了，然后8月份分班考成绩出来，孩子进了普通班，后悔得肠子都青了</strong>。{region_crisis}！<strong>火箭班和普通班的差距，不是学生素质的差距，而是谁在暑假做了准备</strong>。我们的暑假计划，8周把初中1500大纲词清零，开学分班考英语直接碾压。这个暑假，您愿意让孩子是追的那个还是被追的那个？",
+        objections:[
+            {q:"听说进好班全靠关系，学不学没用",a:"妈妈，关系能帮忙进门，但进门后的分班考是有客观分数的。英语高分是最硬的敲门砖，这是实力，任何关系都替代不了的。"},
+            {q:"孩子已经报了数学和语文补习了",a:"正因为都在补数理，英语才是弯道超车的突破口！别人都在补数学，您孩子用暑假把英语拉到最高水平，分班考综合分的优势就出来了。"}
+        ],
+        close:"我们的暑假分班考英语冲刺班，历年有超过80%的学员成功进入重点班。现在还剩最后几个名额，您今天确认，我帮您锁定暑假最强档期，开学带着优势进重点班！",
+        proofs:[{num:"80%",desc:"冲刺学员重点班入选率"},{num:"1500词",desc:"初中大纲词暑假清零目标"},{num:"8周",desc:"暑假冲刺窗口"}]
+    }
+],
+
+"j1": [
+    {
+        month:"m3", time:"3月", event:"初一下开学区统考",
+        importance:"bg-high", impText:"定基调",
+        theory:["学科负担分配","认知带宽","效率优化"],
+        pain:"科目突然增多，英语被挤压。很多孩子开始敷衍英语，导致单词积累脱节，阅读理解开始掉链子。",
+        pitch:"妈妈，初一下学期，科目越来越多，孩子精力有限。很多学生开始'牺牲英语'，觉得英语靠感觉，先把数学物理搞定。<strong>这个判断，是初中三年最大的坑！</strong> {region_crisis}！英语的特点是'欠债越多越难还'，初一词汇不扎实，初二完形填空直接崩。我们系统的核心价值就在这里：<strong>每天只要15分钟，AI自动推送复习，效率是死背的10倍</strong>，把英语维持在最高分状态，同时释放大量时间给其他科目。",
+        objections:[
+            {q:"孩子初一英语还不错，先观察观察",a:"妈妈，初一不错，是因为题目相对简单。初二词汇量和阅读难度会大跳，到时候'还不错'会变成'勉强及格'。现在不错的时候夯实基础，比崩了再补省力得多。"},
+        ],
+        close:"我建议您现在就锁定一个长期的学习方案，把英语系统化管理起来，这样初二加物理也不慌。我帮您规划一下初一到初三的词汇闯关路径图？",
+        proofs:[{num:"15分钟",desc:"每日智能复习维护时长"},{num:"10倍",desc:"vs死记硬背的效率差"},{num:"初二",desc:"英语分化的高发节点"}]
+    },
+    {
+        month:"m4", time:"4月", event:"初一期中统考",
+        importance:"bg-crucial", impText:"年级排名锚定",
+        theory:["形成性评价","错误类型分析","精准补漏"],
+        pain:"初一期中是重要排名节点。英语词汇量不足导致阅读、完形两大板块大量失分，150分制的卷子里这两部分占了60分以上。",
+        pitch:"妈妈，初一期中考英语，<strong>阅读+完形加起来占60分！</strong> 这两部分决定了英语成绩是110+还是85分区别的关键。{region_crisis}！考不好不是孩子不努力，是词汇量没有跟上阅读速度的要求。我们系统做一件事：<strong>提前3周密集攻克期中考高频词汇，阅读速度跟不上就是因为生词太多，认识词，速度和理解自然就上来了</strong>。",
+        objections:[
+            {q:"期中考完了，现在开始会不会太晚？",a:"妈妈，正因为期中结果出来了，我们才知道缺口在哪里！这是最好的时机——带着真实的问题来找解决方案，有的放矢，期末考效果立竿见影。"},
+        ],
+        close:"您把孩子这次期中的卷子拍给我，我帮您免费做一次词汇错误分析，看看缺的是哪类词，然后给您出一个针对期末的补漏方案。",
+        proofs:[{num:"60分",desc:"阅读+完形在英语卷的占比"},{num:"3周",desc:"期中针对词汇冲刺时间"},{num:"110+",desc:"词汇扎实后的英语目标分"}]
+    },
+    {
+        month:"m6", time:"6月", event:"初一期末（极其重要）",
+        importance:"bg-crucial", impText:"初二前夜",
+        theory:["学科分化","负重叠加","基础稳固"],
+        pain:"期末后直接进入初二，加入物理。如果初一英语没达到稳定高分，初二就是全面崩盘的开始。",
+        pitch:"妈妈，我必须非常直接告诉您：<strong>初一期末是整个初中阶段最关键的一次考试，没有之一。</strong> 为什么？因为下学期加物理！加了物理之后，孩子的精力直接被四科瓜分。<strong>'{region_crisis}'</strong>！初一英语没有到120分以上的稳定水平，初二就是'边刷理科边救英语'，两头全崩。这个暑假，用我们的系统把初一大纲词全部强化一遍，带着满弹药进初二，才是正确的打法！",
+        objections:[
+            {q:"孩子暑假要参加体育训练营，时间不够",a:"妈妈，我们有'碎片化学习方案'，每天分三个时段各5分钟，加起来15分钟，随时随地手机学习，完全可以和任何暑假活动并行，不冲突的。"},
+        ],
+        close:"我给您推荐的这个暑假词汇巩固方案，很多初一升初二的孩子用了之后，初二第一次考试英语直接班级前三——因为他们是全班唯一一个暑假没让英语退步的。您是要做那个人吗？",
+        proofs:[{num:"120分",desc:"初二前英语稳定达标目标"},{num:"4科",desc:"初二科目数量压力"},{num:"暑假",desc:"初中最重要的弯道超车时机"}]
+    }
+],
+
+"j2": [
+    {
+        month:"m3", time:"3月上旬", event:"初二开学考（分化起点）",
+        importance:"bg-crucial", impText:"两极分化",
+        theory:["认知负荷叠加","资源竞争","时间经济学"],
+        pain:"加入物理之后，英语时间被严重挤压。使用低效背词法的孩子英语开始快速下滑，而这学期的分化将会直接延续到中考。",
+        pitch:"妈妈！初二是整个初中的<strong>'生死分界线'</strong>！加了物理之后，同一个孩子要应对<strong>4门主科</strong>，时间是恒定的。{region_crisis}！那些用低效方法背单词的孩子，英语就是在这里开始崩的。而用我们系统的孩子怎么做的？<strong>每天15分钟AI推送复习，不占用做题的时间，英语词汇保持'零遗忘状态'</strong>，把所有时间都用在真正需要做题的理科上。初二，英语是你的'躺赢科目'，还是你的'拖后腿科目'，就看这个选择！",
+        objections:[
+            {q:"现在物理太重要了，英语先放一放",a:"妈妈，这是最常见的陷阱。英语一旦放，词汇会以每周5-10%的速度遗忘，三个月后基本等于重学。而且中考英语是150分大科，'放一放'就是在中考成绩上直接割肉。"},
+            {q:"孩子自己在背单词，不需要额外的课",a:"妈妈，孩子自己背单词，每天要花多少时间？背了又忘，再背再忘。我们的系统解决的就是这个问题——用AI算法在最合适的时间提醒复习，15分钟的效果等于孩子自己背1小时，而且记得牢。"}
+        ],
+        close:"我们有专门针对初二的'物理+英语双保险方案'，很多妈妈说这个组合帮孩子在初二保住了两门主科，中考时感谢自己当初做了这个决定。我帮您看看适不适合？",
+        proofs:[{num:"15分钟",desc:"vs自己背词1小时的效率当量"},{num:"150分",desc:"中考英语分值"},{num:"4门",desc:"初二需同时应对的主科数"}]
+    },
+    {
+        month:"m4", time:"4月", event:"初二期中区统考",
+        importance:"bg-crucial", impText:"掉队预警",
+        theory:["词汇深度","推断策略","语义网络"],
+        pain:"完形填空和阅读开始出现大量推断题，词义辨析题——不认识词无法推断，精准词汇成为关键。",
+        pitch:"妈妈，初二期中考英语，<strong>完形填空的坑越来越深！</strong> 现在考的不是'认识这个词'，是'在这个语境里这个词是什么意思'。这叫<strong>词汇深度</strong>——同一个词，高手看见的是它在不同语境里的不同意思，普通学生只知道课本上的那一个。我们系统里每个词都配有<strong>3-5个真实语境例句</strong>，让孩子从多角度认识词汇，完形填空这种语境推断题，认词认得深才能选对！",
+        objections:[
+            {q:"孩子这次期中英语115分，已经不错了",a:"妈妈，115分里面完形填空扣了几分？阅读呢？这两项是提分空间最大的，也是最容易到120+的地方。从115到125，就靠词汇深度这一件事。"},
+        ],
+        close:"这次期中之后，正好是系统性提升词汇深度的最佳时机。我们有个'完形阅读专项词汇突破'，8周内把高频推断词攻克。您孩子下次考试，完形至少可以少错3题！",
+        proofs:[{num:"5个语境",desc:"每词配备真实例句数量"},{num:"115→125",desc:"词汇深度提升后目标分"},{num:"8周",desc:"专项词汇深度突破周期"}]
+    },
+    {
+        month:"m6", time:"6月", event:"初二期末（准初三定档）",
+        importance:"bg-crucial", impText:"准初三起跑线",
+        theory:["中考倒计时","强化学习","核心词汇清零"],
+        pain:"这场考试成绩将直接成为初三一轮复习的参考基准，同时标志着中考备战正式开始，词汇基础不扎实的后果将被放大。",
+        pitch:"妈妈！<strong>初二期末=准初三的起跑线！</strong> 这场考试成绩，老师已经开始用来衡量你孩子在初三班级里的起始位置了。{region_crisis}！这个暑假是整个初中最后一次'战略性充电'的机会。我们要做一件非常具体的事：<strong>用51Talk系统把中考1500核心大纲词全部过一遍，每天强化，暑假结束词汇直接清零</strong>。初三开学，别人还在背词，您孩子已经开始做模拟题了！",
+        objections:[
+            {q:"暑假想让孩子休息一下，初三再用力",a:"妈妈，初三开学后，每个月都是大考。没有任何时间来'补底子'，只有时间'练技巧'。底子在暑假不补，初三就没机会补了。初三放松，是在把中考押在赌注上。"},
+        ],
+        close:"我们的'中考词汇清零暑假计划'，有效期两个月，覆盖1500中考大纲词，每天打卡，结束时我给您出一份'词汇掌握度全报告'。现在报名，七月可以开始冲了。",
+        proofs:[{num:"1500词",desc:"中考英语核心大纲词量"},{num:"2个月",desc:"暑假清零最优时间窗口"},{num:"暑假",desc:"初中最后一次战略充电时机"}]
+    }
+],
+
+"j3": [
+    {
+        month:"m3", time:"3月上旬", event:"初三二轮复习摸底",
+        importance:"bg-crucial", impText:"查漏补缺",
+        theory:["精准学习","边际效益","词汇缺口分析"],
+        pain:"最后一百天，很多孩子在狂刷语法和做题，但词汇缺口才是分数黑洞。遇到不认识的词，做再多题也选不对。",
+        pitch:"妈妈，中考还有100天！现在很多孩子在疯狂做题，但做题也解决不了<strong>词汇缺口</strong>这个根本问题。一篇阅读理解里，超过8%是生词，阅读就崩——这是语言学的定理，不是努力能解决的。{region_crisis}！我们要做的事是<strong>精准定位词汇缺口</strong>：用系统先测出孩子到底哪些词不会，然后死命推送这些词，'只补缺，不浪费'。100天之内把词汇缺口填完，阅读和完形的分数自然就回来了。这比刷100道题更直接！",
+        objections:[
+            {q:"现在离中考近了，换方法会不会打乱节奏",a:"妈妈，我们不是换方法，是加一个'词汇外挂'。孩子继续做他的题，我们的系统每天15分钟在旁边帮他把生词消灭掉。两条线并行，不干扰，只增强。"},
+            {q:"孩子说词汇已经背得差不多了",a:"妈妈，我们可以做一个免费词汇测试，15分钟测出孩子的真实词汇覆盖率。如果真的差不多了，那我们皆大欢喜；如果还有缺口，提前发现总比考场上才发现强。"}
+        ],
+        close:"我们有一个'中考词汇X光扫描'免费服务，15分钟出报告，精确告诉您孩子词汇缺口在哪里，然后给出针对性补漏计划。这个诊断完全免费，要不要先做一个？",
+        proofs:[{num:"100天",desc:"中考倒计时"},{num:"8%",desc:"超过此生词率阅读理解崩溃"},{num:"15分钟",desc:"每日精准词汇补漏时长"}]
+    },
+    {
+        month:"m4", time:"4月中下旬", event:"全市一模统考",
+        importance:"bg-crucial", impText:"签约指标生",
+        theory:["高压测试","错误集中期","冲刺反馈"],
+        pain:"一模成绩是重点高中签约指标生的核心依据，英语120分以上才有资格进入谈判。一模丢分极难在二模挽回。",
+        pitch:"妈妈！一模考试已经不是'练习'了——<strong>一模成绩就是重点高中签约指标生的入场券！</strong> {region_crisis}！英语低于120分，就算你其他科都强，指标生的名单里绝对没有你！现在离一模还有几周，我们做一件事：<strong>把高频近义词、易混淆词、完形陷阱词狂刷6遍</strong>，这些词是一模最容易丢分的地方，刷透了，英语120分稳了！",
+        objections:[
+            {q:"一模都考完了，还来得及吗",a:"妈妈，一模考完，我们可以精准分析哪类词成了陷阱。现在开始，在二模和中考之前还有完整的冲刺时间，亡羊补牢，一模的教训就是最好的备考地图。"},
+        ],
+        close:"我帮您分析一模英语的错题分布，很多孩子的失分集中在同3-4类词汇上，针对这几类词集中突破，二模直接提升8-15分，有非常大的概率。我们来分析一下？",
+        proofs:[{num:"120分",desc:"指标生资格线"},{num:"6遍",desc:"高频易错词冲刺复习轮次"},{num:"8-15分",desc:"精准词汇补漏二模提分幅度"}]
+    },
+    {
+        month:"m6", time:"6月中下旬", event:"决战中考",
+        importance:"bg-crucial", impText:"普职分流",
+        theory:["高压应激","肌肉记忆","临考心态"],
+        pain:"中考五五分流，一半孩子去职业高中，英语每一分都是天堑之差。临考前的词汇稳固是最后的护城河。",
+        pitch:"妈妈，现在距离中考只有最后几天！<strong>{region_crisis}——五五分流，一分之差就是普高和职高的天壤之别。</strong> 这个时候不要做任何新的东西了，只做一件事：用我们系统里的<strong>'中考核心词汇最后一公里'套餐</strong>，把大纲里出现频率最高的那200个词再过一遍，形成绝对的'肌肉记忆'。考场上遇到它们，条件反射式地知道意思——这就是最后几天最高性价比的投入。",
+        objections:[
+            {q:"考前紧张，想让孩子多休息",a:"妈妈，每天15分钟的词汇复习，其实是最好的'考前减压'方式之一——心里有底气，焦虑感自然减少。而且我们的系统是游戏化界面，不像做题那么有压迫感，孩子做了反而会更放松。"},
+        ],
+        close:"现在我可以帮您的孩子在系统里生成一个'最后7天词汇冲刺计划'，每天推送20个高频词复习，零压力零负担，带着最满的弹药上考场。我帮您打开这个计划？",
+        proofs:[{num:"50%",desc:"中考普职分流比例"},{num:"200词",desc:"最后7天核心词汇复习量"},{num:"7天",desc:"考前词汇稳固最后窗口"}]
+    }
+],
+
+"s1": [
+    {
+        month:"m3", time:"3月", event:"高一下开学统考",
+        importance:"bg-high", impText:"新赛道定调",
+        theory:["词汇量级跃升","认知带宽分配","自主学习能力"],
+        pain:"高中3500词海量压迫，初中那套死记硬背完全失效，很多孩子开始对英语产生'努力没用'的无力感。",
+        pitch:"妈妈，进了高中，英语学习进入了完全不同的维度。{region_crisis}！高中3500个单词，靠死记硬背？我算了一笔账：每天背20个词，背完一遍要175天，但<strong>遗忘速度比你背的速度还快！</strong> 这就是为什么那么多孩子高中英语越学越绝望。科学方法是什么？<strong>用AI间隔复习算法</strong>——系统帮你算出每个词的遗忘临界点，在你'快忘没忘'的精准时刻推送复习，等于把3500词'分布式'存进长期记忆，效率是死背的15倍！",
+        objections:[
+            {q:"孩子自制力还可以，自己学应该够",a:"妈妈，自制力只解决学不学的问题，解决不了'学了记不住'的问题。科学的遗忘规律是客观存在的，再自律的孩子用错方法也事倍功半。我们解决的是方法问题。"},
+        ],
+        close:"我建议先让孩子做一个词汇量测试，知道自己现在3500词里真正掌握了多少，再针对缺口制定计划。这个测试免费，要帮您安排一个吗？",
+        proofs:[{num:"3500词",desc:"高中必修词汇量级"},{num:"15倍",desc:"科学间隔复习vs死背效率比"},{num:"175天",desc:"死背一遍3500词所需时长"}]
+    },
+    {
+        month:"m6", time:"6月", event:"高一期末大考",
+        importance:"bg-crucial", impText:"重点班定档",
+        theory:["班级效应","高考选拔通道","战略备考"],
+        pain:"高一期末成绩直接决定高二能否继续留在重点班/冲刺班，英语低于105分基本触发降档警告。",
+        pitch:"妈妈，高一期末这场考试，是留在<strong>重点班还是普通班的分水岭</strong>。{region_crisis}！重点班和普通班的差距不是老师水平，是班级生态——当你身边所有人都在疯狂拼高考的时候，你才会被带着拼。高一期末英语必须守住，用我们的系统把高一大纲词全部强化一遍，期末一战，保住高二的重点班席位。这两年的战略位置，比任何一次考试都重要！",
+        objections:[
+            {q:"高考还有两年，现在不用这么紧张吧",a:"妈妈，高考的竞争，是从高一开始的。那些高三冲刺的学霸，不是高三才开始努力的，是高一就已经把基础打得比别人牢了。两年后的高考，现在的每一个选择都是铺垫。"},
+        ],
+        close:"我们有高一词汇系统化管理方案，帮孩子把高一下学期的词汇全部纳入智能追踪体系，期末前把所有'半生不熟'的词消灭掉，期末稳守110+！",
+        proofs:[{num:"105分",desc:"高二重点班英语最低门槛"},{num:"2年",desc:"从现在到高考的战略窗口"},{num:"110+",desc:"高一期末目标分"}]
+    }
+],
+
+"s2": [
+    {
+        month:"m3", time:"3月上中旬", event:"高二选科分班",
+        importance:"bg-crucial", impText:"赛道决策",
+        theory:["选科竞争生态","英语的通科属性","弱科陷阱"],
+        pain:"选科后，孩子觉得英语是三科必考，不存在'选不选'的问题，开始放松；但实际上这正是英语分化最严重的时期——别人在继续练，你在放松。",
+        pitch:"妈妈！高二选科完成了，很多孩子觉得英语是'固定科目，考就行了'，开始降低投入。<strong>这是高二最危险的认知误区！</strong> {region_crisis}！英语不存在临时抱佛脚——词汇量的积累是月和年的时间维度。高二这一年如果放松词汇练习，高三你会发现阅读理解的生词越来越多，而且根本没有时间补。我们用这学年<strong>把3500词升级到4500词应用级水平</strong>，高三英语直接躺赢其他科！",
+        objections:[
+            {q:"选了理科，英语靠语感就够了",a:"妈妈，高考英语的阅读篇幅年年在加长，对词汇的精准度要求越来越高，语感只能保底，词汇量才能冲高分。理科生往往数学强、英语中，差那几分恰恰是英语的提分机会。"},
+        ],
+        close:"高二是最后一个可以'安静提升英语'的学年，高三全是模拟考，没有时间练基础了。我建议现在锁定一个整学年的词汇系统方案，高三你就只需要收割分数。",
+        proofs:[{num:"4500词",desc:"高考高分英语词汇达标量"},{num:"高二",desc:"最后系统提升词汇的学年"},{num:"1年",desc:"词汇量积累的最短有效周期"}]
+    },
+    {
+        month:"m6", time:"6月", event:"高二期末（准高三）",
+        importance:"bg-crucial", impText:"一轮复习前夕",
+        theory:["高考倒计时","知识系统化","词汇核心化"],
+        pain:"高二期末后就是真正的高三冲刺状态，一轮复习直接进入全科轰炸。没有词汇底子，英语一轮复习等于听天书。",
+        pitch:"妈妈，考完高二期末，就是高三！高三第一件事是'英语一轮复习'，那个节奏快到什么程度？<strong>每周覆盖100-200个词汇，不认识的词，老师不会专门停下来给你解释</strong>。{region_crisis}！这个暑假，是进高三前最后一次可以'系统性清零词汇'的机会。用我们的系统，把整个高中3500词完整刷一遍，把所有'认识但不确定'的词变成'绝对掌握'，带着满弹药进高三，一轮复习从Day 1就能跟上节奏！",
+        objections:[
+            {q:"暑假想报一个高三全科集训营",a:"妈妈，集训营是做题和策略的，词汇是那个营能帮孩子解决的吗？那才是最基础的自学内容。我们做的就是词汇这一件事，跟集训营完美互补，不冲突。"},
+        ],
+        close:"我们的'高考词汇清零暑假计划'，两个月覆盖3500词完整体系，每天40分钟。很多高三生反馈这个暑假是他们整个高中英语学习的转折点，开学感觉阅读一下子顺了。要帮您排一个计划吗？",
+        proofs:[{num:"3500词",desc:"高中词汇暑假完整过一遍"},{num:"40分钟",desc:"每日高效词汇学习时长"},{num:"暑假",desc:"高三前最后词汇系统化时机"}]
+    }
+],
+
+"s3": [
+    {
+        month:"m3", time:"3月", event:"高三二轮/一模",
+        importance:"bg-crucial", impText:"高考倒计时",
+        theory:["精准补漏","高效复习","考点集中化"],
+        pain:"最后100天，孩子都在做模拟题，但词汇缺口是'看不见的底层漏洞'，做多少题都有词看不懂，分数就是上不去。",
+        pitch:"妈妈，高考最后100天！这个阶段最大的误区是<strong>用刷题来解决词汇问题</strong>——刷题是在练技巧，但认不认识词，是另一回事。{region_crisis}！我们做的事情极其精准：<strong>用AI系统对孩子做一次'词汇X光扫描'，找出那最后的300-500个词汇缺口，死命推送复习这些词，每天15分钟，100天之内填完缺口</strong>。这些词填完，阅读的生词率降下来，理解率提上去，分数自然就到了！",
+        objections:[
+            {q:"这时候换工具会不会打乱状态",a:"妈妈，我们是'外挂型系统'，每天只需15分钟，在现有学习计划上叠加，不替代任何东西。就像跑马拉松跑到90公里时，给你加了一瓶能量饮料——只加持，不改变节奏。"},
+            {q:"孩子压力已经很大了，加课会崩溃",a:"妈妈，正因为压力大，我们才强调'每天只需15分钟'，而且是闯关游戏化界面。很多孩子反馈这15分钟反而是每天最放松的时候，因为有成就感——我今天又消灭了20个词！"}
+        ],
+        close:"我们可以现在就帮孩子做一个词汇覆盖率测试，10分钟出报告，精确告诉您缺口有多大，在哪里。掌握数据，心里才有底。要我现在给您发测试链接吗？",
+        proofs:[{num:"100天",desc:"高考倒计时"},{num:"500词",desc:"平均词汇缺口量"},{num:"15分钟",desc:"每日最小有效补漏时长"}]
+    },
+    {
+        month:"m4", time:"4月", event:"高三二模联考",
+        importance:"bg-crucial", impText:"最终定档",
+        theory:["作文档次区分","高级词汇替换","印象管理"],
+        pain:"作文只会用基础词good/do/important，拿不到高级档次的书面分，而高级替换词能直接提升阅卷老师的第一印象。",
+        pitch:"妈妈，高考英语作文，<strong>85%的孩子都被卡在'中等档'</strong>——内容对，但语言平，拿不到高分。为什么？就是因为用词太普通。阅卷老师每天改几百份，<strong>看到'important'看到想睡觉，看到'indispensable'眼睛一亮</strong>——就多给3-5分！这不是投机取巧，这是语言表达能力的体现。我们真人老师会帮孩子整理<strong>'高考作文高频升级词表'</strong>，把20个常用基础词全部替换成高级版，作文档次直接上一层！",
+        objections:[
+            {q:"作文内容好就行了，用词不影响吧",a:"妈妈，高考英语作文阅卷标准里，'词汇多样性'和'句型多样性'是独立的评分维度，直接影响总分的15-20%。内容好是基础，用词好才是拿高分的钥匙。"},
+        ],
+        close:"我们的'高考作文用词升级速训'，20个高频替换词，3次课搞定，性价比极高。正好二模前完成，二模作文直接展示成果，对孩子信心提振非常大。要帮您安排吗？",
+        proofs:[{num:"3-5分",desc:"高级词汇替换提升的卷面印象分"},{num:"20个",desc:"核心高频升级替换词数量"},{num:"85%",desc:"被卡在中等档的作文比例"}]
+    },
+    {
+        month:"m6", time:"6月7-9日", event:"全国统一高考",
+        importance:"bg-crucial", impText:"决战时刻",
+        theory:["应激状态管理","肌肉记忆调用","最小化焦虑"],
+        pain:"考前最后几天，任何复杂的新内容都会增加焦虑，但词汇的最后巩固是最高性价比的提分行为。",
+        pitch:"妈妈！高考前最后几天，什么新东西都不要学了！<strong>只做一件事：把大纲高频核心词再过一遍，强化成肌肉记忆。</strong> {region_crisis}！进了考场，遇到熟悉的词是底气，遇到陌生的词是失分。我们系统有专门的<strong>'考前最后7天词汇守护模式'</strong>，每天20个高频词循环复习，零压力零新增，只是把你已经会的词再'磨尖一点'。带着最稳的状态进考场，就是这场高考最好的准备！",
+        objections:[
+            {q:"现在什么都不想看了，就想着考完",a:"妈妈，我完全理解这种状态，孩子已经非常努力了。我们的守护模式是纯巩固复习，不是学新东西，每天15分钟，就像运动员赛前做热身——不是在学新动作，是在确保肌肉是热的。"},
+        ],
+        close:"我现在帮您孩子打开'考前7天守护模式'，今天就可以开始。进考场前，英语词汇是热的、稳的、有把握的——就这一件事，值了！",
+        proofs:[{num:"7天",desc:"考前词汇守护巩固窗口"},{num:"20词/天",desc:"守护模式每日复习量"},{num:"150分",desc:"高考英语满分，每分必争"}]
+    }
+]
+
+}; // end database
+
+// ─── RENDER ───────────────────────────────────────────────────────
+function renderValue(template, region) {
+    const rd = regionData[region];
+    return template
+        .replace('{region_crisis}', `<span class="text-crisis">${rd.crisis}</span>`)
+        .replace(/{data1}/g, rd.data1)
+        .replace(/{data2}/g, rd.data2);
+}
+
+function generateTimeline() {
+    const region = document.querySelector('#region-group .active').getAttribute('data-val');
+    const grade  = document.querySelector('#grade-group .active').getAttribute('data-val');
+    const months = Array.from(document.querySelectorAll('#month-group .active')).map(b => b.getAttribute('data-val'));
+
+    if (!months.length) { alert('请至少选择一个月份！'); return; }
+    if (!database[grade]) { 
+        document.getElementById('timeline-list').innerHTML = '<p style="padding:20px;color:#888">该学段数据正在更新中，敬请期待</p>';
+        document.getElementById('result-container').style.display = 'block';
+        return;
+    }
+
+    const rd = regionData[region];
+    const items = database[grade].filter(i => months.includes(i.month));
+    const list = document.getElementById('timeline-list');
+    list.innerHTML = '';
+
+    if (!items.length) {
+        list.innerHTML = '<p style="padding:20px;color:#888">所选月份暂无数据，请调整筛选条件</p>';
+    } else {
+        items.forEach(item => {
+            const pitch = renderValue(item.pitch, region);
+            const theory = item.theory.map(t => `<span class="theory-tag red">${t}</span>`).join('');
+            const objHtml = (item.objections || []).map(o => `
+                <div class="objection-box">
+                    <div class="section-title">🛡️ 家长异议处理</div>
+                    <div class="objection-q">家长："${o.q}"</div>
+                    <div class="objection-a">销冠回应：${o.a}</div>
+                </div>
+            `).join('');
+            const proofHtml = (item.proofs || []).map(p => `
+                <div class="proof-item"><div class="proof-num">${p.num}</div><div class="proof-desc">${p.desc}</div></div>
+            `).join('');
+
+            list.innerHTML += `
+            <div class="timeline-card">
+                <div class="card-header">
+                    <div class="card-time">📅 ${item.time}<span class="card-event">${item.event}</span></div>
+                    <div class="card-badge ${item.importance}">${item.impText}</div>
+                </div>
+                <div class="card-body">
+                    <div class="pain-section">
+                        <div class="section-title">⚠️ 精准痛点（暗流）— 先在脑中形成画面再开口</div>
+                        <p>${item.pain}</p>
+                        <div class="theory-tags" style="margin-top:12px;">${theory}</div>
+                    </div>
+
+                    <div class="pitch-main">
+                        <div class="section-title">💬 销冠金句连招 — 照着念，红字重读加停顿</div>
+                        <p>${pitch}</p>
+                    </div>
+
+                    ${objHtml}
+
+                    <div class="close-line">
+                        <div class="close-line-label">🔒 成交收口</div>
+                        <div class="close-line-text">${item.close || ''}</div>
+                    </div>
+
+                    <div class="data-proof">
+                        <div style="width:100%;font-size:11px;color:#999;letter-spacing:1px;font-weight:700;margin-bottom:4px;">📊 数据背书（念出来增加专业感）</div>
+                        <div style="display:flex;gap:12px;flex-wrap:wrap;width:100%">${proofHtml}</div>
+                        <div style="width:100%;font-size:12px;color:#666;margin-top:12px;padding-top:10px;border-top:1px dashed #E0DBD4;">
+                            <strong>地区数据弹药：</strong> ${rd.data1}。${rd.data2}。<em style="color:#888">${rd.exam}</em>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        });
+    }
+
+    const rc = document.getElementById('result-container');
+    rc.style.display = 'block';
+    rc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+</script>
+</body>
+</html>
